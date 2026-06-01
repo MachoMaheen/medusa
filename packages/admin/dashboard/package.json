@@ -89,6 +89,7 @@
     "@types/qrcode": "^1.5.5",
     "@typescript/native-preview": "^7.0.0-dev.20260423.1",
     "eslint": "8",
+    "sonner": "^2.0.7",
     "typescript": "5.9.3"
   },
   "packageManager": "yarn@3.2.1"

@@ -35,6 +35,15 @@ module.exports = {
           "primary-icon": "#93adfe",   // Tinted icons inside brand surfaces
           light: "#edf2fe",            // Selected nav fill, calm active state
         },
+        // Happilee text-color palette — exposed as both fg color and as
+        // background (e.g. dark tooltip surface uses `bg-text-primary`).
+        // Source: ~/.claude/skills/happilee-v3-design-system/references/tokens.md
+        text: {
+          primary: "#181d27",          // Headings, primary copy, dark tooltip bg
+          secondary: "#414651",        // Secondary copy
+          tertiary: "#535862",         // Tertiary copy
+          quaternary: "#717680",       // Muted/placeholder
+        },
         // Happilee status badge palette (exact values from skill tokens.md)
         "hap-status": {
           "active-bg": "#f0fdf4",
