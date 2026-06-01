@@ -34,4 +34,6 @@ dist/**
 /packages/**/.cache
 
 .cursorignore
-**/.medusa
+**/.medusa/.superpowers/
+.superpowers/
+.agent-os/tasks/inflight/

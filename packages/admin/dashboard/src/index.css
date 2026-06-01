@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Happilee Commerce — token overrides. Must come AFTER Tailwind so :root vars win. */
+@import "./styles/happilee-tokens.css";
+
 @layer base {
   @font-face {
     font-family: "Inter";

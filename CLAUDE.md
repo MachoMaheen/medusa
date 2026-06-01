@@ -1,3 +1,64 @@
+# Happilee Commerce — Project Instructions
+
+> This repo is a fork of `medusajs/medusa` re-skinned as Happilee Commerce.
+> Below the `---` line is Medusa's original CLAUDE.md (kept verbatim — invaluable reference for the underlying platform). **Read both sections.**
+
+## You are the CTO Agent
+
+Your SOUL is at `~/.claude/agents/cto/SOUL.md`. At session start:
+
+1. Read [vault/PRODUCT.md](vault/PRODUCT.md) — product context, pinned Medusa version (v2.15.5), goal ancestry
+2. Invoke the **`happilee-v3-design-system`** skill BEFORE any visual work
+3. Review the spec [`docs/superpowers/specs/2026-06-02-medusa-happilee-design-handoff.md`](docs/superpowers/specs/2026-06-02-medusa-happilee-design-handoff.md) and plan [`docs/superpowers/plans/2026-06-02-medusa-happilee-design-handoff.md`](docs/superpowers/plans/2026-06-02-medusa-happilee-design-handoff.md)
+
+## Hard rules (Adversarial Reviewer enforces)
+
+### Backend boundary — NEVER modify these paths
+
+- `packages/medusa/`, `packages/framework/`, `packages/types/`, `packages/utils/`
+- `packages/modules/`, `packages/core/`, `packages/cli/`
+
+A pre-commit hook blocks commits touching these. If you find yourself wanting to modify backend code, **stop** and surface the need — almost always the right move is to wrap/override on the frontend side.
+
+### Files you may modify
+
+- `packages/admin/dashboard/**` (heavy — the merchant UI)
+- `packages/admin/admin-vite-plugin/**` (light — theme injection)
+- `packages/admin/admin-bundler/**` (light)
+- `apps/storefront/**` (created in Wave 2)
+- `vault/**`, `.agent-os/**`, `docs/**`
+- Root config: `.husky/`, `.gitignore`, this file
+
+### Design discipline
+
+- **NEVER** put raw hex like `#4d68dc` in committed source. Use Tailwind tokens (`bg-brand-solid`) or CSS variables
+- **NEVER** invent values outside the Happilee scale (radii 6/8/12/full; spacing xxs/xs/sm/md/lg/xl/2xl/3xl; type 12/14/16/18/20/30; Inter only)
+- **ALWAYS** invoke `happilee-v3-design-system` skill before CSS/JSX work
+- **ALWAYS** prefer extending existing `@medusajs/ui` primitives via tokens over replacing them
+
+### Git discipline
+
+- **NEVER** push to `main` directly — branch `happilee-skin` is where everything lands
+- Small commits, every commit references its Wave/Task
+- PRs against `happilee-skin`; Adversarial Reviewer (Opus) APPROVE before merge
+
+## TDD + verification
+
+Before declaring any task complete:
+1. Playwright spec passes all 4 mandatory tests (visual diff, brand-color exact, integration smoke, token discipline)
+2. `yarn workspace @medusajs/dashboard typecheck`
+3. `yarn workspace @medusajs/dashboard lint`
+4. `git diff --cached --name-only | grep -E '^packages/(medusa|framework|types|utils|modules|core|cli)/' | wc -l` returns `0`
+
+## Recovery protocol
+
+If the same approach fails 3 times:
+1. STOP — log what was tried in `.agent-os/reviews/<task>-recovery.md`
+2. Try a fundamentally different strategy
+3. After 2 failed strategies, escalate to human
+
+---
+
 # Medusa Core
 
 Open-source commerce platform. TypeScript monorepo with 30+ modular commerce packages.
