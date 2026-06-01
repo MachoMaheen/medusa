@@ -139,8 +139,8 @@ const HappileeModalDescription = React.forwardRef<
       <p
         ref={ref}
         className={clx(
-          // 14px Inter, tertiary text color, mt-1 = Happilee spacing sm.
-          "mt-1 text-sm text-ui-fg-subtle leading-5",
+          // 14px Inter, muted text (per canonical token map ADR), mt-1 = Happilee spacing sm.
+          "mt-1 text-sm text-ui-fg-muted leading-5",
           className,
         )}
         {...rest}
