@@ -1,0 +1,236 @@
+/* Happilee v3 token overlay — applied AFTER Medusa's @medusajs/ui-preset.
+   Repoints Medusa's CSS variables to Happilee v3 values.
+   Source: ~/.claude/skills/happilee-v3-design-system/assets/tokens/tokens.ts
+           ~/.claude/skills/happilee-v3-design-system/references/tokens.md
+   Date: 2026-06-02
+
+   NOTE: Medusa's ui-preset declares variables WITHOUT a `--ui-` prefix
+   (e.g. `--bg-base`, `--fg-base`, `--border-base`, `--button-*`,
+   `--tag-*`, `--elevation-*`). The override below mirrors those exact
+   names so it actually takes effect at the cascade level.
+
+   The five non-negotiables enforced here:
+   1. Brand blue = #4d68dc (primary CTA / brand mark only)
+   2. Inter is the only font (applied via font-family override)
+   3. Page bg = #fafafa, card surfaces = #ffffff
+   4. Selected/active = #edf2fe fill + #4158bd text (NOT a saturated brand fill)
+   5. Radii scale only 6 / 8 / 12 / full
+*/
+
+:root {
+  /* ── Brand (Happilee v3) ──────────────────────────────────────────── */
+  --brand-solid: #4d68dc;
+  --brand-secondary-fg: #5d7bf1;
+  --brand-secondary-text: #4158bd;
+  --brand-primary-icon: #93adfe;
+  --brand-light: #edf2fe;
+  --alpha-brand-active: rgba(93, 123, 241, 0.12);
+
+  /* ── Backgrounds ──────────────────────────────────────────────────── */
+  --bg-base: #ffffff;                  /* card / panel surface */
+  --bg-base-hover: #fafafa;
+  --bg-base-pressed: #f5f5f5;
+  --bg-subtle: #fafafa;                /* page background, header bands */
+  --bg-subtle-hover: #f5f5f5;
+  --bg-subtle-pressed: #e9eaeb;
+  --bg-component: #ffffff;
+  --bg-component-hover: #fafafa;
+  --bg-component-pressed: #f5f5f5;
+  --bg-field: #ffffff;
+  --bg-field-hover: #fafafa;
+  --bg-field-component: #ffffff;
+  --bg-field-component-hover: #fafafa;
+  --bg-highlight: #edf2fe;             /* selected / active state */
+  --bg-highlight-hover: #dde6fd;
+  --bg-interactive: #4d68dc;
+  --bg-disabled: #f5f5f5;
+  --bg-overlay: rgba(24, 29, 39, 0.6);
+  --bg-switch-off: #e9eaeb;
+  --bg-switch-off-hover: #d5d7da;
+
+  /* ── Foreground (text / icon) ─────────────────────────────────────── */
+  --fg-base: #181d27;                  /* primary text */
+  --fg-subtle: #414651;                /* secondary text */
+  --fg-muted: #717680;                 /* muted / placeholders */
+  --fg-disabled: #a4a7ae;
+  --fg-on-color: #ffffff;              /* text on brand fills */
+  --fg-on-inverted: #ffffff;
+  --fg-interactive: #4d68dc;
+  --fg-interactive-hover: #4158bd;
+  --fg-error: #b42318;
+
+  /* ── Borders ──────────────────────────────────────────────────────── */
+  --border-base: #e9eaeb;
+  --border-strong: #d5d7da;
+  --border-menu-top: #e9eaeb;
+  --border-menu-bot: #e9eaeb;
+  --border-interactive: #4d68dc;
+  --border-error: #fda29b;
+  --border-danger: #d92d20;
+  --border-transparent: rgba(0, 0, 0, 0);
+
+  /* ── Buttons ──────────────────────────────────────────────────────── */
+  --button-inverted: #181d27;
+  --button-inverted-hover: #414651;
+  --button-inverted-pressed: #535862;
+  --button-neutral: #ffffff;
+  --button-neutral-hover: #fafafa;
+  --button-neutral-pressed: #f5f5f5;
+  --button-danger: #d92d20;
+  --button-danger-hover: #b42318;
+  --button-danger-pressed: #912018;
+  --button-transparent: rgba(0, 0, 0, 0);
+  --button-transparent-hover: rgba(0, 0, 0, 0.04);
+  --button-transparent-pressed: rgba(0, 0, 0, 0.08);
+
+  /* ── Contrast (sidebar / inverted surfaces) ───────────────────────── */
+  --contrast-bg-base: #ffffff;
+  --contrast-bg-base-hover: #fafafa;
+  --contrast-bg-base-pressed: #f5f5f5;
+  --contrast-bg-subtle: #fafafa;
+  --contrast-border-base: #e9eaeb;
+  --contrast-border-top: #e9eaeb;
+  --contrast-border-bot: #e9eaeb;
+  --contrast-fg-primary: #181d27;
+  --contrast-fg-secondary: #414651;
+
+  /* ── Tag tokens (status pills) ────────────────────────────────────── */
+  /* neutral → Happilee draft (slate) */
+  --tag-neutral-bg: #f8fafc;
+  --tag-neutral-bg-hover: #f1f5f9;
+  --tag-neutral-border: #e2e8f0;
+  --tag-neutral-text: #334155;
+  --tag-neutral-icon: #475569;
+
+  /* blue → Happilee brand-light */
+  --tag-blue-bg: #edf2fe;
+  --tag-blue-bg-hover: #dde6fd;
+  --tag-blue-border: #c7d4fb;
+  --tag-blue-text: #4158bd;
+  --tag-blue-icon: #5d7bf1;
+
+  /* green → Happilee active */
+  --tag-green-bg: #f0fdf4;
+  --tag-green-bg-hover: #dcfce7;
+  --tag-green-border: #bbf7d0;
+  --tag-green-text: #15803d;
+  --tag-green-icon: #16a34a;
+
+  /* orange → Happilee paused */
+  --tag-orange-bg: #fffbeb;
+  --tag-orange-bg-hover: #fef3c7;
+  --tag-orange-border: #fde68a;
+  --tag-orange-text: #b45309;
+  --tag-orange-icon: #d97706;
+
+  /* red → danger */
+  --tag-red-bg: #fef3f2;
+  --tag-red-bg-hover: #fee4e2;
+  --tag-red-border: #fda29b;
+  --tag-red-text: #b42318;
+  --tag-red-icon: #d92d20;
+
+  /* purple → secondary brand */
+  --tag-purple-bg: #f4f3ff;
+  --tag-purple-bg-hover: #ebe9fe;
+  --tag-purple-border: #d9d6fe;
+  --tag-purple-text: #5925dc;
+  --tag-purple-icon: #6938ef;
+
+  /* ── Alpha utilities ──────────────────────────────────────────────── */
+  --alpha-250: rgba(0, 0, 0, 0.05);
+  --alpha-400: rgba(0, 0, 0, 0.1);
+
+  /* ── Elevation (shadows) — Happilee scale ─────────────────────────── */
+  --elevation-card-rest: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --elevation-card-hover: 0px 1px 3px 0px rgba(0, 0, 0, 0.1),
+    0px 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --elevation-code-block: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --elevation-tooltip: 0px 2px 2px -1px rgba(0, 0, 0, 0.04),
+    0px 4px 6px -2px rgba(0, 0, 0, 0.03),
+    0px 12px 16px -4px rgba(0, 0, 0, 0.08);
+  --elevation-flyout: 0px 2px 2px -1px rgba(0, 0, 0, 0.04),
+    0px 4px 6px -2px rgba(0, 0, 0, 0.03),
+    0px 12px 16px -4px rgba(0, 0, 0, 0.08);
+  --elevation-modal: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --elevation-commandbar: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.06);
+
+  /* ── Skeuomorphic / composite borders ─────────────────────────────── */
+  --borders-base: 0 0 0 1px #e9eaeb;
+  --borders-error: 0 0 0 1px #fda29b;
+  --borders-focus: 0 0 0 4px rgba(77, 104, 220, 0.18), 0 0 0 1px #4d68dc;
+  --borders-interactive-with-active: 0 0 0 4px rgba(77, 104, 220, 0.18),
+    0 0 0 1px #4d68dc;
+  --borders-interactive-with-focus: 0 0 0 4px rgba(77, 104, 220, 0.18),
+    0 0 0 1px #4d68dc;
+  --borders-interactive-with-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px -2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+
+  /* ── Component-level (buttons composite) ──────────────────────────── */
+  --buttons-danger: 0px 1px 2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px -2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+  --buttons-danger-focus: 0 0 0 4px rgba(217, 45, 32, 0.18);
+  --buttons-inverted: 0px 1px 2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px -2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+  --buttons-inverted-focus: 0 0 0 4px rgba(24, 29, 39, 0.18);
+  --buttons-neutral: 0px 1px 2px 0px rgba(0, 0, 0, 0.05),
+    inset 0px 0px 0px 1px #e9eaeb;
+  --buttons-neutral-focus: 0 0 0 4px rgba(77, 104, 220, 0.18);
+
+  /* ── Details (switch / contrast) ──────────────────────────────────── */
+  --details-contrast-on-bg-interactive: #ffffff;
+  --details-switch-background: #e9eaeb;
+  --details-switch-background-focus: 0 0 0 4px rgba(77, 104, 220, 0.18);
+  --details-switch-handle: #ffffff;
+
+  /* ── Happilee scale tokens (consumers can reference directly) ─────── */
+  --radii-sm: 6px;
+  --radii-md: 8px;
+  --radii-xl: 12px;
+  --shadow-hap-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-hap-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1),
+    0px 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-hap-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0px 2px 4px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Dark mode — preserve Medusa behavior, rebrand brand surfaces ──── */
+.dark {
+  --brand-solid: #5d7bf1;
+  --brand-secondary-fg: #93adfe;
+  --brand-secondary-text: #93adfe;
+  --brand-light: rgba(93, 123, 241, 0.12);
+  --alpha-brand-active: rgba(93, 123, 241, 0.18);
+
+  --bg-highlight: rgba(93, 123, 241, 0.12);
+  --bg-highlight-hover: rgba(93, 123, 241, 0.18);
+  --bg-interactive: #5d7bf1;
+
+  --fg-interactive: #93adfe;
+  --fg-interactive-hover: #c7d4fb;
+
+  --border-interactive: #5d7bf1;
+
+  --tag-blue-bg: rgba(93, 123, 241, 0.12);
+  --tag-blue-bg-hover: rgba(93, 123, 241, 0.18);
+  --tag-blue-border: rgba(93, 123, 241, 0.24);
+  --tag-blue-text: #93adfe;
+  --tag-blue-icon: #5d7bf1;
+
+  --borders-focus: 0 0 0 4px rgba(93, 123, 241, 0.24), 0 0 0 1px #5d7bf1;
+  --borders-interactive-with-active: 0 0 0 4px rgba(93, 123, 241, 0.24),
+    0 0 0 1px #5d7bf1;
+  --borders-interactive-with-focus: 0 0 0 4px rgba(93, 123, 241, 0.24),
+    0 0 0 1px #5d7bf1;
+}
+
+/* ── Typography: Inter is the only font (non-negotiable #2) ───────── */
+:root {
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+}

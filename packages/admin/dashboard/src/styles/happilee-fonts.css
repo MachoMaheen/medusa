@@ -1,0 +1,115 @@
+/* Happilee v3 font integration — Inter family with feature settings.
+   Source: Happilee v3 typography spec (references/tokens.md).
+   Date: 2026-06-02
+
+   Per the Happilee v3 design system:
+   - Inter is the ONLY font (body, headings, UI — no mixing)
+   - Weights used: 400 regular, 500 medium, 600 semibold, 700 bold
+   - Stylistic sets cv02/cv03/cv04/cv11 + tabular figures (tnum)
+   - Sizes: 12 / 14 / 16 / 18 / 20 / 30 px */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  --font-family: var(--font-sans);
+  --font-family-sans: var(--font-sans);
+  /* Override Medusa @medusajs/ui font tokens (if present at runtime). */
+  --font-sans-serif: var(--font-sans);
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
+}
+
+html,
+body,
+#root,
+#medusa-portal-root {
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Override Medusa's font-family at the highest practical specificity. */
+.medusa-app,
+body *,
+[class*='medusa-'],
+[class*='Medusa'] {
+  font-family: var(--font-sans);
+}
+
+/* Form controls and buttons do not inherit font-family by default in some browsers. */
+button,
+input,
+select,
+textarea,
+optgroup {
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+}
+
+/* Headings use semibold (600) per Happilee spec — page titles, card titles, section headings. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: inherit;
+  letter-spacing: -0.01em;
+}
+
+/* Page title scale: 30/38 displaySm. Only used on top-level page titles. */
+h1 {
+  font-size: 30px;
+  line-height: 38px;
+  letter-spacing: -0.02em;
+}
+
+/* Section heading: 18/28 lg */
+h2 {
+  font-size: 18px;
+  line-height: 28px;
+}
+
+/* Card / sub-section title: 16/24 md */
+h3 {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+/* Tabular numerals for data-dense surfaces: tables, stats cards, currency, counters, badges with numbers. */
+table,
+th,
+td,
+[role='table'],
+[role='row'],
+[role='cell'],
+[role='columnheader'],
+.tabular-nums,
+[data-tabular-nums='true'] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum', 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Code blocks keep monospace but inherit Happilee's smoothing. */
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-mono);
+  font-feature-settings: normal;
+}
+
+/* Strong / b — use semibold (600), not the browser default 700, to match Happilee weight scale. */
+strong,
+b {
+  font-weight: 600;
+}

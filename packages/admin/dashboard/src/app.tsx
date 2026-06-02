@@ -9,6 +9,10 @@ import routeModule from "virtual:medusa/routes"
 import widgetModule from "virtual:medusa/widgets"
 
 import "./index.css"
+// Happilee v3 token overlay — must come AFTER index.css so :root overrides
+// resolve later in the cascade than Medusa's preset CSS variables.
+import "./styles/happilee-tokens.css"
+import "./styles/happilee-fonts.css"
 
 const localPlugin = {
   widgetModule,
