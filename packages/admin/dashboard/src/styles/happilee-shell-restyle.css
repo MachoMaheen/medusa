@@ -473,3 +473,139 @@ html {
   border-top: 1px solid var(--border-menu-bot);
   margin-top: 4px !important;
 }
+
+/* =====================================================================
+   PRODUCTION HARDENING PASS (Option B)
+   Six concerns addressed (numbered to match task brief):
+     H-1. Mobile drawer (RadixDialog) scoping safety
+     H-2. Sub-route active state (e.g. /products/abc/edit)
+     H-3. Hover flyout (none in Medusa main-layout — documented no-op)
+     H-4. Dark mode safety (no raw hex; var(--*) throughout)
+     H-5. Scroll behavior for overflowing rail
+     H-6. Tooltip portal must not be display:none'd
+   ===================================================================== */
+
+/* ── H-1. Mobile drawer (RadixDialog.Content) — explicit reset ──────── */
+/* The mobile sidebar lives inside RadixDialog.Portal → RadixDialog.Content
+   which is rendered to document.body (outside the DesktopSidebarContainer
+   DOM). The Content element has classes:
+       max-w-[304px]  bg-ui-bg-subtle  shadow-elevation-modal  fixed
+   It does NOT have a parent matching `[class~="w-[220px]"]:has(> aside)`,
+   so all rules above are correctly desktop-scoped. The explicit reset
+   below is a belt-and-braces safety net: if any future restructure ever
+   puts the mobile drawer inside a w-[220px] wrapper, force its width back
+   to 304px (Medusa's spec) and unhide labels. */
+[class~="max-w-\[304px\]"][role="dialog"],
+[class~="max-w-\[304px\]"][role="dialog"] aside,
+[role="dialog"][class~="max-w-\[304px\]"] [class~="w-\[220px\]"] {
+  width: 100% !important;
+  max-width: 304px !important;
+}
+[role="dialog"][class~="max-w-\[304px\]"] aside nav > .px-3 a > span,
+[role="dialog"][class~="max-w-\[304px\]"] aside nav > .px-3 a > p,
+[role="dialog"][class~="max-w-\[304px\]"]
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > p,
+[role="dialog"][class~="max-w-\[304px\]"]
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > span {
+  display: inline !important;
+}
+[role="dialog"][class~="max-w-\[304px\]"] aside nav > .px-3 a,
+[role="dialog"][class~="max-w-\[304px\]"]
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a {
+  width: auto !important;
+  height: auto !important;
+  justify-content: flex-start !important;
+}
+
+/* ── H-2. Sub-route active state ────────────────────────────────────── */
+/* NavItem (nav-item.tsx) uses pathname.startsWith(to) for core/setting
+   types, applying ACTIVE_NAV_LINK_CLASSES = "bg-ui-bg-base
+   shadow-elevation-card-rest text-ui-fg-base hover:bg-ui-bg-base".
+   So on /products/abc/edit, the /products NavLink gets `.bg-ui-bg-base`.
+   The existing rule at lines 183-202 already targets `.bg-ui-bg-base`,
+   `.active`, and `[aria-current="page"]`. Re-asserted here at a higher
+   specificity so deep sub-route nav (/products/123, /products/123/edit,
+   /products/123/variants/v_1, etc.) keeps the highlight even if Medusa's
+   own utility classes apply in a different order at higher cascade depth. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 > div.w-full > a.bg-ui-bg-base,
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 > div > a.bg-ui-bg-base,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a.bg-ui-bg-base {
+  background-color: var(--bg-highlight) !important;
+  color: var(--brand-secondary-text) !important;
+  box-shadow: none !important;
+}
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a.bg-ui-bg-base > div > svg,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a.bg-ui-bg-base > div > svg {
+  color: var(--brand-secondary-text) !important;
+}
+
+/* ── H-3. Hover flyout — documented no-op ───────────────────────────── */
+/* Audit of main-layout.tsx confirms Medusa's rail has NO hover-expand
+   mechanism. The DesktopSidebarContainer is a fixed 220px width div with
+   no hover state on its parent. Therefore the `display: none` on labels
+   has no hover-expand interaction to conflict with. No rule required.
+   If Medusa adds hover-expand upstream, intercept here with:
+       [class~="w-\[220px\]"]:hover .happilee-label-hidden { display: …; } */
+
+/* ── H-4. Dark mode safety ──────────────────────────────────────────── */
+/* All color / shadow values above resolve through var(--*). The .dark
+   block in happilee-tokens.css already remaps --brand-solid,
+   --bg-highlight, --brand-secondary-text, --bg-base, --fg-muted etc. to
+   dark-appropriate values. Re-assert the .dark rail border + bg here so
+   the high-specificity overrides above keep their var-based values when
+   the .dark class flips at the root. (No hardcoded hex below.) */
+.dark [class~="w-\[220px\]"]:has(> aside),
+.dark [class~="w-\[220px\]"]:has(> aside) > aside,
+.dark [class~="w-\[220px\]"]:has(> aside) aside .bg-ui-bg-subtle.sticky {
+  background-color: var(--bg-base) !important;
+  border-color: var(--border-menu-bot) !important;
+}
+/* Default rail icon color in dark mode follows --fg-muted (token-remapped). */
+.dark [class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a {
+  color: var(--fg-muted) !important;
+}
+
+/* ── H-5. Scroll behavior for overflowing rail ──────────────────────── */
+/* The aside already has overflow-y-auto from Medusa
+   (className="flex flex-1 flex-col justify-between overflow-y-auto").
+   On a 56px rail with many extension nav items this can scroll. Keep the
+   vertical scroll, suppress any horizontal overflow that 40px buttons
+   in an 8px-padded rail could theoretically introduce, and hide the
+   webkit scrollbar so the rail stays visually clean. */
+[class~="w-\[220px\]"]:has(> aside) > aside {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;          /* Firefox */
+}
+[class~="w-\[220px\]"]:has(> aside) > aside::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* ── H-6. Tooltip portal must remain visible ────────────────────────── */
+/* ConditionalTooltip (from main-layout via NavItem) wraps in Radix
+   Tooltip. Radix renders Tooltip.Content into a portal at document.body,
+   so it is OUTSIDE the `[class~="w-[220px]"]:has(> aside)` scope of every
+   rule above — meaning none of our `display: none` rules can touch it.
+   The explicit safety net below ensures any tooltip portal element keeps
+   its display intact even if a future stray descendant selector reaches
+   it. The "[role=tooltip]" / "[data-side]" attribute selectors match
+   Radix's tooltip primitive specifically. */
+[role="tooltip"],
+[data-radix-popper-content-wrapper],
+[data-radix-tooltip-content],
+[data-side][data-state] {
+  display: block !important;
+}
+[role="tooltip"] *,
+[data-radix-tooltip-content] * {
+  display: revert !important;
+}
