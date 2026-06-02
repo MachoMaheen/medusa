@@ -51,6 +51,7 @@
   /* ── Foreground (text / icon) ─────────────────────────────────────── */
   --fg-base: #181d27;                  /* primary text */
   --fg-subtle: #414651;                /* secondary text */
+  --fg-tertiary: #535862;              /* rail icon default (live ref) */
   --fg-muted: #717680;                 /* muted / placeholders */
   --fg-disabled: #a4a7ae;
   --fg-on-color: #ffffff;              /* text on brand fills */
@@ -195,6 +196,12 @@
   --radii-sm: 6px;
   --radii-md: 8px;
   --radii-xl: 12px;
+
+  /* ── Shell-specific tokens (live-app drift absorbed from canonical
+     reference: localhost:3000 renders rail + tier-2 panel on a subtle
+     blue-tinted surface, NOT pure white. See audit H1.) ────────────── */
+  --rail-bg: #f4f6ff;                  /* rail + tier-2 background (live) */
+  --tier2-border: #e9eaeb;             /* tier-2 left edge separator */
   --shadow-hap-xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
   --shadow-hap-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1),
     0px 1px 2px -1px rgba(0, 0, 0, 0.06);
@@ -236,4 +243,30 @@
 :root {
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── C1. Primary CTA — force white text on brand-blue button ──────────
+   Medusa's ui-preset maps the "inverted" Button variant to
+   `bg-ui-bg-base-inverted` + `text-ui-fg-on-inverted`. Our token
+   override repointed `--button-inverted` to brand blue (#4d68dc) but the
+   text color compiled into Medusa's bundle still resolves to `--fg-base`
+   on some Button class compositions (computed: rgb(24,29,39) — 3.4:1
+   contrast, WCAG fail). Force white on every Button class that uses our
+   brand-blue fill. The selectors are scoped to elements that actually
+   carry the inverted/brand-solid utility, so neutral/danger buttons are
+   untouched. Uses var(--fg-on-color) which is already #ffffff. */
+button[class*="bg-ui-bg-base-inverted"],
+button[class*="bg-ui-button-inverted"],
+button[class*="bg-ui-button-inverted"] *,
+[class*="bg-ui-bg-base-inverted"][role="button"],
+button[type="submit"][class*="bg-ui-bg-base-inverted"],
+button[type="submit"][class*="bg-ui-button-inverted"] {
+  color: var(--fg-on-color) !important;        /* #ffffff */
+}
+/* Ensure nested text spans inside the inverted button inherit white. */
+button[class*="bg-ui-bg-base-inverted"] > span,
+button[class*="bg-ui-button-inverted"] > span,
+button[class*="bg-ui-bg-base-inverted"] > p,
+button[class*="bg-ui-button-inverted"] > p {
+  color: var(--fg-on-color) !important;
 }
