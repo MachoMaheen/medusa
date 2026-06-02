@@ -20,11 +20,26 @@
        drawers / modals that share Tailwind utility classes.
 */
 
+/* ── 0. Cross-browser :has() fallback ─────────────────────────────────
+   Firefox < 121 (Dec 2023), Safari < 15.4, and older Chromium do not
+   support :has(). Every selector below depends on it. When :has() is
+   unsupported, NONE of these rules apply — users see the stock Medusa
+   220px sidebar. That is acceptable degraded behavior: the dashboard
+   remains fully functional, just not visually restyled. We declare
+   this fallback explicitly so future maintainers know the contract.
+   No CSS is emitted inside the @supports — the absence of the restyle
+   IS the fallback. (Logging this as a documented choice, not a bug.) */
+@supports not (selector(:has(*))) {
+  /* Intentionally empty: full restyle skipped → Medusa default UI. */
+}
+
 /* ── 1. Shrink the desktop sidebar container 220px → 56px ─────────── */
+/* Uses logical `border-inline-end` for RTL support — Medusa flips
+   document direction via useDocumentDirection() (main-layout.tsx). */
 .hap-shell-root [class~="w-\[220px\]"],
 [class~="w-\[220px\]"]:has(> aside) {
   width: 56px !important;
-  border-right: 1px solid var(--border-menu-bot) !important;
+  min-width: 56px !important;
   border-inline-end: 1px solid var(--border-menu-bot) !important;
 }
 
@@ -266,8 +281,8 @@
    content doesn't feel cramped at the new offset. */
 @media (min-width: 1024px) {
   main > .max-w-\[1600px\] {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding-inline-start: 24px !important;
+    padding-inline-end: 24px !important;
   }
 }
 
@@ -470,8 +485,86 @@ html {
   .flex.flex-col.gap-y-0\.5.py-3 {
   padding-top: 8px !important;
   padding-bottom: 8px !important;
-  border-top: 1px solid var(--border-menu-bot);
+  border-block-start: 1px solid var(--border-menu-bot);
   margin-top: 4px !important;
+}
+
+/* =====================================================================
+   T-2. Tier-2 expandable panel (220px) — hover-only, best-effort
+   ---------------------------------------------------------------------
+   Spec section 3.1 mandates "56px rail + 220px tier-two expandable
+   panel". A pure-CSS implementation cannot synchronize a tier-2 panel
+   with React-state-driven content (which item is hovered, which sub-
+   routes belong to it, etc.). Implementing it properly requires JSX
+   changes to MainSidebar — out of scope for Option B (which is a
+   no-TSX-edit overlay).
+
+   This CSS-only stub gives the visual affordance: hovering anywhere on
+   the rail container expands the desktop sidebar wrapper from 56px to
+   276px (56 rail + 220 panel) and reveals the previously-hidden NavLink
+   labels as a flyout. The 220px panel reuses the existing label DOM
+   instead of being a separately-rendered tier-2 surface.
+
+   Documented limitation: the panel is hover-only, not click-pinnable,
+   and it does NOT show grouped sub-routes per-section — it just shows
+   each top-level NavItem's label inline. A true tier-2 panel with
+   independent content per rail item is deferred to Wave 3 alongside
+   the MainSidebar JSX refactor.
+
+   Triggered only on devices that support hover (i.e. not touch). */
+@media (hover: hover) and (pointer: fine) {
+  [class~="w-\[220px\]"]:has(> aside):hover {
+    width: 276px !important;
+    transition: width 120ms ease-out;
+  }
+  [class~="w-\[220px\]"]:has(> aside):hover > aside {
+    width: 276px !important;
+    overflow-x: hidden !important;
+  }
+  /* Reveal hidden labels on hover — flyout. The NavLink itself widens to
+     fill the tier-2 panel, the icon stays at the start, the label
+     appears in inline-start order (auto-flips in RTL). */
+  [class~="w-\[220px\]"]:has(> aside):hover aside nav > .px-3 a,
+  [class~="w-\[220px\]"]:has(> aside):hover
+    aside
+    .flex.flex-col.gap-y-0\.5.py-3 .px-3 a {
+    width: 252px !important;
+    justify-content: flex-start !important;
+    padding-inline-start: 10px !important;
+    padding-inline-end: 10px !important;
+    gap: 8px !important;
+  }
+  [class~="w-\[220px\]"]:has(> aside):hover aside nav > .px-3 a > span,
+  [class~="w-\[220px\]"]:has(> aside):hover aside nav > .px-3 a > p,
+  [class~="w-\[220px\]"]:has(> aside):hover
+    aside
+    .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > span,
+  [class~="w-\[220px\]"]:has(> aside):hover
+    aside
+    .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > p {
+    display: inline-block !important;
+    font-size: 14px;
+    line-height: 20px;
+    color: inherit;
+  }
+  /* The wrapper divs that the centering rules collapsed to 40px — let
+     them stretch to the new 252px width on hover. */
+  [class~="w-\[220px\]"]:has(> aside):hover aside nav > .px-3,
+  [class~="w-\[220px\]"]:has(> aside):hover aside nav > .px-3 > div.w-full,
+  [class~="w-\[220px\]"]:has(> aside):hover
+    aside
+    .flex.flex-col.gap-y-0\.5.py-3 > .px-3 {
+    justify-content: flex-start !important;
+    width: 252px !important;
+    padding-inline-start: 8px !important;
+  }
+  /* Respect users who opted out of motion. */
+  @media (prefers-reduced-motion: reduce) {
+    [class~="w-\[220px\]"]:has(> aside),
+    [class~="w-\[220px\]"]:has(> aside):hover {
+      transition: none !important;
+    }
+  }
 }
 
 /* =====================================================================
@@ -590,22 +683,19 @@ html {
   display: none !important;
 }
 
-/* ── H-6. Tooltip portal must remain visible ────────────────────────── */
-/* ConditionalTooltip (from main-layout via NavItem) wraps in Radix
-   Tooltip. Radix renders Tooltip.Content into a portal at document.body,
-   so it is OUTSIDE the `[class~="w-[220px]"]:has(> aside)` scope of every
-   rule above — meaning none of our `display: none` rules can touch it.
-   The explicit safety net below ensures any tooltip portal element keeps
-   its display intact even if a future stray descendant selector reaches
-   it. The "[role=tooltip]" / "[data-side]" attribute selectors match
-   Radix's tooltip primitive specifically. */
-[role="tooltip"],
-[data-radix-popper-content-wrapper],
-[data-radix-tooltip-content],
-[data-side][data-state] {
-  display: block !important;
-}
-[role="tooltip"] *,
-[data-radix-tooltip-content] * {
-  display: revert !important;
-}
+/* ── H-6. (REMOVED) Tooltip portal global override ──────────────────── */
+/* Earlier this block carried `display: block !important` on
+   `[data-side][data-state]` and `display: revert !important` on
+   `[role="tooltip"] *` / `[data-radix-tooltip-content] *`.
+
+   Opus reviewer flagged this as a critical regression: the
+   `[data-side][data-state]` selector matches EVERY Radix popper
+   (DropdownMenu Content, Select Content, Popover, ContextMenu,
+   HoverCard) — forcing `display: block` clobbers Radix's
+   inline-flex/grid defaults and breaks dropdown alignment app-wide.
+   `[role="tooltip"] *` reverted UA defaults on every descendant of
+   tooltip content, breaking the keyboard-shortcut tooltip layout.
+
+   The tooltip portal is rendered to `document.body` and is therefore
+   already outside the `[class~="w-[220px]"]:has(> aside)` scope of all
+   desktop rules in this file — no override was ever needed. */

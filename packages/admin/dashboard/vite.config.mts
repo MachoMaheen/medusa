@@ -36,7 +36,9 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       open: true,
-      port: 5175,
+      // VITE_DEV_PORT env override so parallel dashboards / CI can pick a
+      // free port. Falls back to 5175 to preserve dev ergonomics.
+      port: env.VITE_DEV_PORT ? Number(env.VITE_DEV_PORT) : 5175,
     },
   }
 })
