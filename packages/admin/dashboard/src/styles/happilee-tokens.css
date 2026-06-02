@@ -237,3 +237,28 @@
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
 }
+
+/* ── Primary button text color: WCAG fix (audit C1) ───────────────────
+   Medusa's primary Button variant composes:
+     text-ui-contrast-fg-primary  (→ --contrast-fg-primary = #181d27)
+     bg-ui-button-inverted        (→ --button-inverted    = #4d68dc)
+   That paints dark text on saturated brand blue (3.4:1 contrast → fails
+   AA). The Happilee live reference uses pure white text on brand blue.
+
+   We CANNOT redirect --contrast-fg-primary globally because the JSON-view
+   sidebar surface (json-view-section.tsx) reuses the same token on a
+   light contrast surface and depends on dark text. Instead we scope the
+   override to the button host: any element that paints itself with
+   bg-ui-button-inverted gets white text. The Tailwind preset emits
+   `.bg-ui-button-inverted { background-color: var(--button-inverted); }`
+   so the selector below matches the live class on every primary button
+   without touching its siblings.
+*/
+.bg-ui-button-inverted,
+.bg-ui-button-inverted:hover,
+.bg-ui-button-inverted:active,
+.bg-ui-button-inverted:focus,
+.bg-ui-button-inverted:focus-visible,
+.bg-ui-button-inverted:disabled {
+  color: #ffffff;
+}

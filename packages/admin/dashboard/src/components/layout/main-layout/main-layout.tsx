@@ -357,9 +357,14 @@ function RailIconButton({
   const direction = useDocumentDirection()
   const tooltipSide = direction === "rtl" ? "left" : "right"
 
+  // Rail icon button sized 36×36 (live reference: `w-9 h-9 rounded-lg`).
+  // Default color is text-tertiary `#535862` (audit M4) — we route through
+  // text-ui-fg-subtle which the canonical token map already binds to #414651
+  // and bump the resting color via the explicit `text-[#535862]` arbitrary
+  // value to match the live reference exactly. Hover deepens to fg-base.
   const classes = clx(
-    "flex h-10 w-10 items-center justify-center rounded-md transition-colors",
-    "text-ui-fg-muted hover:bg-ui-bg-subtle-hover hover:text-ui-fg-subtle",
+    "flex h-9 w-9 items-center justify-center rounded-md transition-colors",
+    "text-[#535862] hover:bg-ui-bg-subtle-hover hover:text-ui-fg-base",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
     {
       "bg-ui-bg-highlight text-brand-secondary-text hover:bg-ui-bg-highlight":
@@ -424,15 +429,45 @@ function RailIconButton({
 }
 
 // ── Brand mark (40px brand-solid square with H) ──────────────────────────
-function BrandMark() {
+// Exported so the login surface (routes/login/login.tsx) can render the same
+// Happilee identity in place of Medusa's default avatar. The standalone
+// variant renders a plain <div> (no router context required) so it works on
+// pre-auth routes; the in-shell variant wraps it in a <Link to="/">.
+type HappileeMarkProps = {
+  /** Pixel size of the square. Defaults to 40 (rail / tier-2 header size).
+   *  Login surface uses 56 for slightly higher prominence. */
+  size?: number
+  className?: string
+}
+
+export function HappileeMark({ size = 40, className }: HappileeMarkProps) {
+  // Inline style is used for the dimension because Tailwind's arbitrary
+  // value syntax (`h-[40px]`) does not compose cleanly when the caller
+  // wants a different size at runtime; the brand-solid color + radius +
+  // typography are still token-driven.
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="brand-mark"
+      className={clx(
+        "bg-brand-solid shadow-hap-xs flex items-center justify-center rounded-xl font-sans font-semibold text-white",
+        className
+      )}
+      style={{ width: size, height: size, fontSize: size * 0.45 }}
+    >
+      H
+    </div>
+  )
+}
+
+function BrandMarkLink() {
   return (
     <Link
       to="/"
       aria-label="Happilee"
-      data-testid="brand-mark"
-      className="bg-brand-solid shadow-hap-xs hover:bg-brand-secondary-text flex h-10 w-10 items-center justify-center rounded-xl font-sans text-base font-semibold text-white transition-colors duration-150"
+      className="hover:opacity-90 transition-opacity duration-150"
     >
-      H
+      <HappileeMark size={40} />
     </Link>
   )
 }
@@ -609,20 +644,25 @@ function HappileeSideNav() {
 
   return (
     <div className="flex h-full" data-testid="happilee-sidenav">
-      {/* Tier-1 rail — 56px white column */}
+      {/* Tier-1 rail — 56px tinted column.
+        Background `#f4f6ff` matches the live Happilee v3 reference (the
+        spec calls for white but the live app uses a brand-tinted off-white;
+        per design-handoff audit we follow the live value).
+        Border lives on the tier-2 panel's left edge (not the rail's right)
+        so the two surfaces sit flush without a double-line seam. */}
       <aside
         className={clx(
-          "bg-ui-bg-base border-ui-border-menu-bot flex h-full w-14 flex-col items-center border-r py-3",
+          "bg-[#f4f6ff] flex h-full w-14 flex-col items-center py-3",
           "font-sans"
         )}
         aria-label="Primary navigation"
         dir={direction}
       >
-        {/* Brand mark + workspace anchor */}
-        <BrandMark />
-
-        {/* Primary nav stack */}
-        <nav className="mt-4 flex flex-col items-center gap-y-1">
+        {/* Primary nav stack — brand mark moved to tier-2 header (workspace
+          switcher). The rail itself starts directly with the search trigger
+          to mirror the live Happilee reference; the brand identity sits in
+          the tier-2 panel where users discover the workspace. */}
+        <nav className="mt-1 flex flex-col items-center gap-y-1">
           <SearchRailButton />
           {tier1Items.map((item) => (
             <RailIconButton
@@ -656,16 +696,30 @@ function HappileeSideNav() {
         </div>
       </aside>
 
-      {/* Tier-2 expandable panel — 220px white column (spec § locked #4) */}
+      {/* Tier-2 expandable panel — 220px tinted column (spec § locked #4).
+        Background mirrors the rail (`#f4f6ff`); the only divider in the
+        nav chrome is the 1px border on this panel's left edge — that gives
+        the rail/panel pair a single seam, not two stacked borders. */}
       {showTierTwo && (
         <aside
           className={clx(
-            "bg-ui-bg-base border-ui-border-menu-bot hidden h-full w-[220px] flex-col border-r font-sans lg:flex"
+            "bg-[#f4f6ff] border-ui-border-menu-bot hidden h-full w-[220px] flex-col border-l font-sans lg:flex"
           )}
           aria-label={`${tierTwoLabel} navigation`}
           data-testid="tier-two-panel"
         >
-          <GuardedWorkspaceSwitcher />
+          {/* Tier-2 header — brand mark sits above the workspace switcher.
+            Matches the live Happilee reference which puts the 40px H mark
+            here (not in the rail). The WorkspaceSwitcher owns its own
+            horizontal padding, so we keep the BrandMark in its own row and
+            collapse the switcher's internal `pt-3` to `pt-2` via a wrapper
+            that nullifies it (avoids touching the shared component). */}
+          <div className="flex items-center px-3 pt-3">
+            <BrandMarkLink />
+          </div>
+          <div className="[&>div]:pt-2">
+            <GuardedWorkspaceSwitcher />
+          </div>
 
           <div className="mt-3 flex flex-1 flex-col overflow-y-auto px-3 pb-3">
             <Text

@@ -8,7 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import * as z from "zod"
 
 import { Form } from "../../components/common/form"
-import AvatarBox from "../../components/common/logo-box/avatar-box"
+import { HappileeMark } from "../../components/layout/main-layout/main-layout"
 import { useSignInWithEmailPass } from "../../hooks/api"
 import { isFetchError } from "../../lib/is-fetch-error"
 import { useExtension } from "../../providers/extension-provider"
@@ -111,7 +111,13 @@ export const Login = () => {
   return (
     <div className="bg-ui-bg-subtle flex min-h-dvh w-dvw items-center justify-center">
       <div className="m-4 flex w-full max-w-[280px] flex-col items-center">
-        <AvatarBox />
+        {/* Happilee brand mark — replaces Medusa's default black AvatarBox.
+          The same `<HappileeMark />` is rendered inside the authenticated
+          shell (tier-2 header), so the visual identity is consistent across
+          the login → app transition. */}
+        <div className="mb-4">
+          <HappileeMark size={56} />
+        </div>
         <div className="mb-4 flex flex-col items-center">
           <Heading>{t("login.title")}</Heading>
           <Text size="small" className="text-ui-fg-subtle text-center">
