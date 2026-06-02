@@ -1,6 +1,10 @@
-/* Happilee v3 font integration — Inter family with feature settings.
+/* Happilee v3 font integration — Inter family, self-hosted.
    Source: Happilee v3 typography spec (references/tokens.md).
    Date: 2026-06-02
+   Updated: 2026-06-02 (F.C. fix — replaced Google Fonts @import with @font-face
+   declarations pointing at local .ttf files under ../assets/fonts/. Eliminates
+   the runtime CDN dependency, GDPR exposure on every page load, FOUT, and CSP
+   `style-src 'self'` failures. Addresses Option C review issue #9.)
 
    Per the Happilee v3 design system:
    - Inter is the ONLY font (body, headings, UI — no mixing)
@@ -8,7 +12,37 @@
    - Stylistic sets cv02/cv03/cv04/cv11 + tabular figures (tnum)
    - Sizes: 12 / 14 / 16 / 18 / 20 / 30 px */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Bold.ttf') format('truetype');
+}
 
 :root {
   --font-sans:
@@ -35,11 +69,14 @@ body,
   text-rendering: optimizeLegibility;
 }
 
-/* Override Medusa's font-family at the highest practical specificity. */
+/* Override Medusa's font-family at the Medusa-specific scope only.
+   The previous `body *, [class*='medusa-'], [class*='Medusa']` selector was a
+   universal-style wildcard that hurt CSS perf and silently overrode components
+   that deliberately use a different font (Kbd, <code>, etc.). Now we scope to
+   the Medusa app root, then let intrinsic family rules (code/kbd/pre below)
+   win for monospace surfaces. Addresses Option C review issue #10. */
 .medusa-app,
-body *,
-[class*='medusa-'],
-[class*='Medusa'] {
+[class*='medusa-']:not(code):not(kbd):not(pre):not(samp) {
   font-family: var(--font-sans);
 }
 

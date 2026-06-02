@@ -16,7 +16,7 @@
  * ADR — .agent-os/decisions/2026-06-02-canonical-token-map.md).
  */
 
-import { TriangleRightMini, XMark } from "@medusajs/icons"
+import { SidebarLeft, TriangleRightMini, XMark } from "@medusajs/icons"
 import { IconButton, clx } from "@medusajs/ui"
 import { AnimatePresence } from "motion/react"
 import { Dialog as RadixDialog } from "radix-ui"
@@ -208,10 +208,35 @@ const Breadcrumbs = () => {
   )
 }
 
+/**
+ * Mobile-only drawer trigger. Restores the affordance lost in the Wave 0
+ * shell rewrite — without it, users at viewport < 640px have no UI handle
+ * for opening the nav drawer (Option C review issue #1). Hidden on >= 640px
+ * because the rail is permanently visible there.
+ */
+const MobileSidebarToggle = () => {
+  const { t } = useTranslation()
+  const { toggle } = useSidebar()
+
+  return (
+    <IconButton
+      className="sm:hidden"
+      variant="transparent"
+      onClick={() => toggle("mobile")}
+      size="small"
+      aria-label={t("app.nav.accessibility.title")}
+      data-testid="mobile-sidebar-toggle"
+    >
+      <SidebarLeft className="text-ui-fg-muted rtl:rotate-180" />
+    </IconButton>
+  )
+}
+
 const Topbar = () => {
   return (
     <div className="bg-ui-bg-base border-ui-border-menu-bot grid w-full grid-cols-2 border-b px-4 py-2.5">
       <div className="flex items-center gap-x-1.5">
+        <MobileSidebarToggle />
         <Breadcrumbs />
       </div>
       <div className="flex items-center justify-end gap-x-3">
