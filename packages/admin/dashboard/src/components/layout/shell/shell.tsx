@@ -1,8 +1,32 @@
-import { SidebarLeft, TriangleRightMini, XMark } from "@medusajs/icons"
+/**
+ * Shell — Happilee chrome wrapper (Wave 0 port).
+ *
+ * Replaces Medusa's stock 220px sidebar container + topbar gutter with the
+ * Happilee shell: a flex row hosting a SideNav slot on the left, a slim
+ * Notifications topbar on the right, and the routed <Outlet /> below.
+ *
+ * The actual sidebar UI is supplied by MainLayout (HappileeSideNav). Shell
+ * stays generic so other layouts (settings-layout) can reuse it with a
+ * different sidebar implementation later.
+ *
+ * Mobile (< 640px): the sidebar slides in as a Radix Dialog instead of
+ * being permanently visible, controlled by useSidebar().toggle("mobile").
+ *
+ * All Tailwind classes use Medusa preset `ui-*` tokens (canonical token map
+ * ADR — .agent-os/decisions/2026-06-02-canonical-token-map.md).
+ */
+
+import { TriangleRightMini, XMark } from "@medusajs/icons"
 import { IconButton, clx } from "@medusajs/ui"
 import { AnimatePresence } from "motion/react"
 import { Dialog as RadixDialog } from "radix-ui"
-import { PropsWithChildren, ReactNode, useEffect, useState } from "react"
+import {
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react"
 import { useTranslation } from "react-i18next"
 import {
   Link,
@@ -18,21 +42,39 @@ import { useSidebar } from "../../../providers/sidebar-provider"
 import { ProgressBar } from "../../common/progress-bar"
 import { Notifications } from "../notifications"
 
-export const Shell = ({ children }: PropsWithChildren) => {
+type ShellProps = {
+  /**
+   * The sidebar element to render on the left side of the chrome.
+   * MainLayout passes the Happilee 56px rail + tier-two panel here.
+   * For backwards compatibility, children are still rendered inside the
+   * mobile drawer when no `sidebar` prop is provided.
+   */
+  sidebar?: ReactNode
+}
+
+export const Shell = ({
+  children,
+  sidebar,
+}: PropsWithChildren<ShellProps>): ReactElement => {
   const globalShortcuts = useGlobalShortcuts()
   const navigation = useNavigation()
 
   const loading = navigation.state === "loading"
+  const sidebarContent = sidebar ?? children
 
   return (
     <KeybindProvider shortcuts={globalShortcuts}>
-      <div className="relative flex h-screen flex-col items-start overflow-hidden lg:flex-row">
+      <div className="bg-ui-bg-subtle relative flex h-screen w-screen flex-row items-stretch overflow-hidden font-sans">
         <NavigationBar loading={loading} />
-        <div>
-          <MobileSidebarContainer>{children}</MobileSidebarContainer>
-          <DesktopSidebarContainer>{children}</DesktopSidebarContainer>
-        </div>
-        <div className="flex h-screen w-full flex-col overflow-auto">
+
+        {/* Desktop Happilee chrome — sidebar permanently visible >= 640px */}
+        <div className="hidden h-full shrink-0 sm:block">{sidebarContent}</div>
+
+        {/* Mobile drawer — same sidebar content, slides in via Radix Dialog */}
+        <MobileSidebarContainer>{sidebarContent}</MobileSidebarContainer>
+
+        {/* Content area */}
+        <div className="bg-ui-bg-subtle flex h-full w-full min-w-0 flex-1 flex-col overflow-hidden">
           <Topbar />
           <main
             className={clx(
@@ -166,55 +208,15 @@ const Breadcrumbs = () => {
   )
 }
 
-const ToggleSidebar = () => {
-  const { toggle } = useSidebar()
-
-  return (
-    <div>
-      <IconButton
-        className="hidden lg:flex"
-        variant="transparent"
-        onClick={() => toggle("desktop")}
-        size="small"
-      >
-        <SidebarLeft className="text-ui-fg-muted rtl:rotate-180" />
-      </IconButton>
-      <IconButton
-        className="hidden max-lg:flex"
-        variant="transparent"
-        onClick={() => toggle("mobile")}
-        size="small"
-      >
-        <SidebarLeft className="text-ui-fg-muted rtl:rotate-180" />
-      </IconButton>
-    </div>
-  )
-}
-
 const Topbar = () => {
   return (
-    <div className="grid w-full grid-cols-2 border-b p-3">
+    <div className="bg-ui-bg-base border-ui-border-menu-bot grid w-full grid-cols-2 border-b px-4 py-2.5">
       <div className="flex items-center gap-x-1.5">
-        <ToggleSidebar />
         <Breadcrumbs />
       </div>
       <div className="flex items-center justify-end gap-x-3">
         <Notifications />
       </div>
-    </div>
-  )
-}
-
-const DesktopSidebarContainer = ({ children }: PropsWithChildren) => {
-  const { desktop } = useSidebar()
-
-  return (
-    <div
-      className={clx("hidden h-screen w-[220px] border-e", {
-        "lg:flex": desktop,
-      })}
-    >
-      {children}
     </div>
   )
 }
@@ -234,11 +236,11 @@ const MobileSidebarContainer = ({ children }: PropsWithChildren) => {
         />
         <RadixDialog.Content
           className={clx(
-            "bg-ui-bg-subtle shadow-elevation-modal fixed inset-y-2 start-2 flex w-full max-w-[304px] flex-col overflow-hidden rounded-lg border-r",
+            "bg-ui-bg-base shadow-hap-md fixed inset-y-2 start-2 flex w-full max-w-[304px] flex-col overflow-hidden rounded-xl",
             "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-start-1/2 data-[state=open]:slide-in-from-start-1/2 duration-200"
           )}
         >
-          <div className="p-3">
+          <div className="absolute end-2 top-2 z-10">
             <RadixDialog.Close asChild>
               <IconButton
                 size="small"

@@ -32,10 +32,11 @@ export default defineConfig(({ mode }) => {
       __STOREFRONT_URL__: JSON.stringify(STOREFRONT_URL),
       __AUTH_TYPE__: JSON.stringify(env.VITE_MEDUSA_AUTH_TYPE || "session"),
       __JWT_TOKEN_STORAGE_KEY__: JSON.stringify(env.VITE_MEDUSA_JWT_TOKEN_STORAGE_KEY || "medusa_auth_token"),
+      __MAX_UPLOAD_FILE_SIZE__: JSON.stringify(env.VITE_MEDUSA_MAX_UPLOAD_FILE_SIZE || 50_000_000),
     },
     server: {
       open: true,
-      port: 5174,
+      port: 5176,
     },
   }
 })
