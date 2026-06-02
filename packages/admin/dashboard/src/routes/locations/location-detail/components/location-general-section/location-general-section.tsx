@@ -10,15 +10,13 @@ import {
 import { HttpTypes } from "@medusajs/types"
 import {
   Badge,
-  Container,
   Divider,
-  Heading,
   IconButton,
-  StatusBadge,
   Text,
   toast,
   usePrompt,
 } from "@medusajs/ui"
+import { HappileeBadge } from "../../../../../components/common/happilee-badge/happilee-badge"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -61,21 +59,26 @@ export const LocationGeneralSection = ({
 }: LocationGeneralSectionProps) => {
   return (
     <>
-      <Container className="p-0">
+      <div
+        data-happilee-section=""
+        className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans"
+      >
         <div className="flex items-center justify-between px-6 py-4">
-          <div>
-            <Heading>{location.name}</Heading>
-            <Text className="text-ui-fg-subtle txt-small">
+          <div className="flex flex-col gap-1 min-w-0">
+            <h1 className="text-base font-semibold leading-6 text-ui-fg-base truncate">
+              {location.name}
+            </h1>
+            <p className="text-sm leading-5 text-ui-fg-muted truncate">
               {getFormattedAddress({
                 address: location.address as
                   | HttpTypes.AdminOrderAddress
                   | undefined,
               }).join(", ")}
-            </Text>
+            </p>
           </div>
           <Actions location={location} />
         </div>
-      </Container>
+      </div>
 
       <FulfillmentSet
         locationId={location.id}
@@ -548,18 +551,21 @@ function FulfillmentSet(props: FulfillmentSetProps) {
       ]
 
   return (
-    <Container className="p-0">
-      <div className="flex flex-col divide-y">
+    <div
+      data-happilee-section=""
+      className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans"
+    >
+      <div className="flex flex-col divide-y divide-ui-border-menu-bot">
         <div className="flex items-center justify-between px-6 py-4">
-          <Heading level="h2">
+          <h2 className="text-base font-semibold leading-6 text-ui-fg-base">
             {t(`stockLocations.fulfillmentSets.${type}.header`)}
-          </Heading>
+          </h2>
           <div className="flex items-center gap-4">
-            <StatusBadge color={fulfillmentSetExists ? "green" : "grey"}>
+            <HappileeBadge variant={fulfillmentSetExists ? "active" : "draft"}>
               {t(
                 fulfillmentSetExists ? "statuses.enabled" : "statuses.disabled"
               )}
-            </StatusBadge>
+            </HappileeBadge>
 
             <ActionMenu groups={groups} />
           </div>
@@ -579,7 +585,7 @@ function FulfillmentSet(props: FulfillmentSetProps) {
         )}
 
         {hasServiceZones && (
-          <div className="flex flex-col divide-y">
+          <div className="flex flex-col divide-y divide-ui-border-menu-bot">
             {fulfillmentSet?.service_zones.map((zone) => (
               <ServiceZone
                 zone={zone}
@@ -592,7 +598,7 @@ function FulfillmentSet(props: FulfillmentSetProps) {
           </div>
         )}
       </div>
-    </Container>
+    </div>
   )
 }
 

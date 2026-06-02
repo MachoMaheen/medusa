@@ -22,7 +22,10 @@ export const OrderEditBillingAddress = () => {
   return (
     <RouteDrawer>
       <RouteDrawer.Header>
-        <Heading>{t("orders.edit.billingAddress.title")}</Heading>
+        {/* Wave 2.1 — Happilee drawer-title typography. */}
+        <Heading className="font-sans text-lg font-semibold text-ui-fg-base">
+          {t("orders.edit.billingAddress.title")}
+        </Heading>
       </RouteDrawer.Header>
 
       {order && <EditOrderBillingAddressForm order={order} />}

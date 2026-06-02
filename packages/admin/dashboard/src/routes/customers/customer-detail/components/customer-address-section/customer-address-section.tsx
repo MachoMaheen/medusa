@@ -1,11 +1,12 @@
 import { HttpTypes } from "@medusajs/types"
-import { clx, Container, Heading, toast, usePrompt } from "@medusajs/ui"
+import { clx, Heading, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 import { Trash } from "@medusajs/icons"
 import { Link, useNavigate } from "react-router-dom"
 import { ActionMenu } from "../../../../../components/common/action-menu"
 import { NoRecords } from "../../../../../components/common/empty-table-content"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
 import { Listicle } from "../../../../../components/common/listicle"
 import { PermissionGuard } from "../../../../../components/common/permission-guard"
 import { useDeleteCustomerAddress } from "../../../../../hooks/api/customers"
@@ -57,13 +58,23 @@ export const CustomerAddressSection = ({
     })
   }
 
+  // Wave 2.3 — Sidebar widget panel. Same recipe but without the body divider,
+  // because the Listicle rows below paint their own dividers.
   return (
-    <Container className="p-0">
+    <HappileeCard
+      data-testid="customer-addresses-section"
+      className="min-h-0 gap-0 overflow-hidden p-0"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("addresses.title")}</Heading>
+        <Heading level="h2" className="text-ui-fg-base">
+          {t("addresses.title")}
+        </Heading>
         {/* Only show add link if user has update permission */}
         <PermissionGuard resource="customer" operation="update">
-          <Link to={`create-address`} className="text-ui-fg-muted text-xs">
+          <Link
+            to={`create-address`}
+            className="text-brand-secondary-text text-xs hover:underline"
+          >
             Add
           </Link>
         </PermissionGuard>
@@ -108,6 +119,6 @@ export const CustomerAddressSection = ({
           </Listicle>
         )
       })}
-    </Container>
+    </HappileeCard>
   )
 }

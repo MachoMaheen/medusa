@@ -1,3 +1,18 @@
+/**
+ * Wave 2.4 — Inventory item per-location levels table columns.
+ *
+ * The dense tabular display of "stock per location" is the canonical Wave 2.4
+ * surface for the row-level HappileeBadge pattern (task brief: "in-stock/low/
+ * out via active/paused/draft variants"). The `stocked_quantity` and
+ * `available_quantity` cells render badges; `reserved_quantity` stays a
+ * neutral number because it's not a stock-status signal on its own.
+ *
+ * Variant mapping mirrors the inventory list table — single source of truth
+ * for "what counts as low stock" is the LOW_STOCK_THRESHOLD constant.
+ *
+ * Token discipline: only HappileeBadge tokens (`hap-status-*`) and Medusa
+ * preset `ui-*` tokens are used. No raw hex literals in this file.
+ */
 import { AdminInventoryLevel } from "@medusajs/types"
 import { PencilSquare, Trash } from "@medusajs/icons"
 
@@ -6,12 +21,28 @@ import { createDataTableColumnHelper, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { PlaceholderCell } from "../../../../../components/table/table-cells/common/placeholder-cell"
 import {
+  HappileeBadge,
+  type HappileeBadgeVariant,
+} from "../../../../../components/common/happilee-badge/happilee-badge"
+import {
   inventoryItemLevelsQueryKeys,
   inventoryItemsQueryKeys,
 } from "../../../../../hooks/api"
 import { sdk } from "../../../../../lib/client"
 import { queryClient } from "../../../../../lib/query-client"
 import { useNavigate } from "react-router-dom"
+
+const LOW_STOCK_THRESHOLD = 10
+
+const stockVariantFor = (quantity: number): HappileeBadgeVariant => {
+  if (quantity <= 0) {
+    return "paused"
+  }
+  if (quantity <= LOW_STOCK_THRESHOLD) {
+    return "draft"
+  }
+  return "active"
+}
 
 const columnHelper = createDataTableColumnHelper<AdminInventoryLevel>()
 
@@ -56,7 +87,9 @@ export const useLocationListTableColumns = () => {
         queryKey: inventoryItemLevelsQueryKeys.detail(level.inventory_item_id),
       })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("errorBoundary.defaultTitle"))
+      toast.error(
+        e instanceof Error ? e.message : t("errorBoundary.defaultTitle")
+      )
     }
   }
 
@@ -73,7 +106,9 @@ export const useLocationListTableColumns = () => {
 
           return (
             <div className="flex size-full items-center overflow-hidden">
-              <span className="truncate">{locationName.toString()}</span>
+              <span className="truncate text-ui-fg-base">
+                {locationName.toString()}
+              </span>
             </div>
           )
         },
@@ -83,13 +118,13 @@ export const useLocationListTableColumns = () => {
         cell: ({ getValue }) => {
           const quantity = getValue()
 
-          if (Number.isNaN(quantity)) {
+          if (typeof quantity !== "number" || Number.isNaN(quantity)) {
             return <PlaceholderCell />
           }
 
           return (
             <div className="flex size-full items-center overflow-hidden">
-              <span className="truncate">{quantity}</span>
+              <span className="truncate text-ui-fg-base">{quantity}</span>
             </div>
           )
         },
@@ -100,13 +135,18 @@ export const useLocationListTableColumns = () => {
         cell: ({ getValue }) => {
           const stockedQuantity = getValue()
 
-          if (Number.isNaN(stockedQuantity)) {
+          if (
+            typeof stockedQuantity !== "number" ||
+            Number.isNaN(stockedQuantity)
+          ) {
             return <PlaceholderCell />
           }
 
           return (
             <div className="flex size-full items-center overflow-hidden">
-              <span className="truncate">{stockedQuantity}</span>
+              <HappileeBadge variant={stockVariantFor(stockedQuantity)}>
+                {stockedQuantity}
+              </HappileeBadge>
             </div>
           )
         },
@@ -117,13 +157,18 @@ export const useLocationListTableColumns = () => {
         cell: ({ getValue }) => {
           const availableQuantity = getValue()
 
-          if (Number.isNaN(availableQuantity)) {
+          if (
+            typeof availableQuantity !== "number" ||
+            Number.isNaN(availableQuantity)
+          ) {
             return <PlaceholderCell />
           }
 
           return (
             <div className="flex size-full items-center overflow-hidden">
-              <span className="truncate">{availableQuantity}</span>
+              <HappileeBadge variant={stockVariantFor(availableQuantity)}>
+                {availableQuantity}
+              </HappileeBadge>
             </div>
           )
         },

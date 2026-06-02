@@ -1,6 +1,13 @@
+/**
+ * Wave 2.4 — Location → Sales channels sidebar section.
+ *
+ * Re-skinned chrome only. No raw hex literals — all tokens route through the
+ * Medusa preset `ui-*` map per
+ * `.agent-os/decisions/2026-06-02-canonical-token-map.md`.
+ */
 import { Channels, PencilSquare } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading, Text } from "@medusajs/ui"
+import { Text } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
@@ -22,9 +29,14 @@ function LocationsSalesChannelsSection({
   const hasConnectedChannels = !!location.sales_channels?.length
 
   return (
-    <Container className="flex flex-col px-6 py-4">
+    <div
+      data-happilee-section=""
+      className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans flex flex-col px-6 py-4"
+    >
       <div className="flex items-center justify-between">
-        <Heading level="h2">{t("stockLocations.salesChannels.header")}</Heading>
+        <h2 className="text-base font-semibold leading-6 text-ui-fg-base">
+          {t("stockLocations.salesChannels.header")}
+        </h2>
         <ActionMenu
           groups={[
             {
@@ -43,7 +55,7 @@ function LocationsSalesChannelsSection({
         <div className="flex flex-col gap-y-4 pt-4">
           <div className="grid grid-cols-[28px_1fr] items-center gap-x-3">
             <IconAvatar>
-              <Channels className="text-ui-fg-subtle" />
+              <Channels className="text-ui-fg-muted" />
             </IconAvatar>
             <ListSummary
               n={3}
@@ -52,7 +64,7 @@ function LocationsSalesChannelsSection({
               list={location.sales_channels?.map((sc) => sc.name) ?? []}
             />
           </div>
-          <Text className="text-ui-fg-subtle" size="small" leading="compact">
+          <Text className="text-ui-fg-muted" size="small" leading="compact">
             {t("stockLocations.salesChannels.connectedTo", {
               count: location.sales_channels?.length,
               total: count,
@@ -69,7 +81,7 @@ function LocationsSalesChannelsSection({
           message={t("stockLocations.salesChannels.noChannels")}
         />
       )}
-    </Container>
+    </div>
   )
 }
 

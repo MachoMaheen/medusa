@@ -1,11 +1,12 @@
 import { ArrowPath } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
 import { _DataTable } from "../../../../../components/table/data-table"
 import { useOrders } from "../../../../../hooks/api/orders"
 import { useOrderTableColumns } from "../../../../../hooks/table/columns/use-order-table-columns"
@@ -60,10 +61,16 @@ export const CustomerOrderSection = ({
     throw error
   }
 
+  // Wave 2.3 — Customer orders panel: same "tall section" HappileeCard recipe.
   return (
-    <Container className="divide-y p-0">
+    <HappileeCard
+      data-testid="customer-orders-section"
+      className="divide-ui-border-menu-bot min-h-0 gap-0 divide-y overflow-hidden p-0"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("orders.domain")}</Heading>
+        <Heading level="h2" className="text-ui-fg-base">
+          {t("orders.domain")}
+        </Heading>
         {/* TODO: ENABLE WHEN DRAFT ORDERS ARE DONE*/}
         {/* <div className="flex items-center gap-x-2">*/}
         {/*  <Button size="small" variant="secondary">*/}
@@ -89,7 +96,7 @@ export const CustomerOrderSection = ({
         queryObject={raw}
         prefix={PREFIX}
       />
-    </Container>
+    </HappileeCard>
   )
 }
 

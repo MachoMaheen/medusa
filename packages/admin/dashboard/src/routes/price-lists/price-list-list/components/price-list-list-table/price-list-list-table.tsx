@@ -41,11 +41,19 @@ export const PriceListListTable = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <Container
+      className="divide-y divide-ui-border-menu-bot p-0"
+      data-testid="price-lists-list-container"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <div>
-          <Heading>{t("priceLists.domain")}</Heading>
-          <Text className="text-ui-fg-subtle" size="small">
+        <div className="flex flex-col gap-y-1">
+          <Heading
+            className="text-ui-fg-base font-semibold"
+            data-testid="price-lists-list-heading"
+          >
+            {t("priceLists.domain")}
+          </Heading>
+          <Text className="text-ui-fg-muted" size="small">
             {t("priceLists.subtitle")}
           </Text>
         </div>

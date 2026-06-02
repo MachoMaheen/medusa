@@ -1,27 +1,33 @@
 import { GlobeEurope, PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading, StatusBadge, toast, usePrompt } from "@medusajs/ui"
+import { Container, Heading, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import {
+  HappileeBadge,
+  HappileeBadgeVariant,
+} from "../../../../../components/common/happilee-badge/happilee-badge"
 import { SectionRow } from "../../../../../components/common/section"
 import { useDeleteProduct } from "../../../../../hooks/api/products"
 import { useExtension } from "../../../../../providers/extension-provider"
 import { useFeatureFlag } from "../../../../../providers/feature-flag-provider"
 
-const productStatusColor = (status: string) => {
+// Map Medusa's product status to Happilee status-badge variants. The Happilee
+// palette has three semantic states (active/draft/paused) covered by the
+// canonical-token-map. "proposed" and "rejected" are uncommon Medusa states
+// without a 1:1 Happilee equivalent — they fall back to the "draft" pill so
+// they stay readable without introducing out-of-scale colors.
+const productStatusVariant = (status: string): HappileeBadgeVariant => {
   switch (status) {
-    case "draft":
-      return "grey"
-    case "proposed":
-      return "orange"
     case "published":
-      return "green"
+      return "active"
+    case "draft":
+    case "proposed":
     case "rejected":
-      return "red"
     default:
-      return "grey"
+      return "draft"
   }
 }
 
@@ -68,14 +74,18 @@ export const ProductGeneralSection = ({
     })
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{product.title}</Heading>
+    <Container
+      data-happilee-surface="product-general"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
+        <Heading className="text-ui-fg-base">{product.title}</Heading>
         <div className="flex items-center gap-x-4">
-          <StatusBadge color={productStatusColor(product.status)}>
+          <HappileeBadge variant={productStatusVariant(product.status)}>
             {t(`products.productStatus.${product.status}`)}
-          </StatusBadge>
+          </HappileeBadge>
           <ActionMenu
             groups={[
               {

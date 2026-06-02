@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Input, toast } from "@medusajs/ui"
+import { Input, toast } from "@medusajs/ui"
+// Wave 2.6 — primary/secondary footer CTAs use HappileeButton.
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
@@ -72,13 +74,13 @@ export const EditApiKeyForm = ({ apiKey }: EditApiKeyFormProps) => {
         <RouteDrawer.Footer>
           <div className="flex items-center gap-x-2">
             <RouteDrawer.Close asChild>
-              <Button size="small" variant="secondary">
+              <HappileeButton size="sm" variant="secondary">
                 {t("actions.cancel")}
-              </Button>
+              </HappileeButton>
             </RouteDrawer.Close>
-            <Button size="small" type="submit" isLoading={isPending}>
+            <HappileeButton size="sm" type="submit" isLoading={isPending}>
               {t("actions.save")}
-            </Button>
+            </HappileeButton>
           </div>
         </RouteDrawer.Footer>
       </KeyboundForm>

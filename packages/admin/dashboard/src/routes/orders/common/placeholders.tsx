@@ -15,7 +15,11 @@ export const ReturnShippingPlaceholder = () => {
           i18nKey="orders.returns.placeholders.noReturnShippingOptions.hint"
           components={{
             LinkComponent: (
-              <Link to={`/settings/locations`} className="text-blue-500" />
+              // Wave 2.1 — Happilee link color (brand-secondary-text #4158bd).
+              <Link
+                to={`/settings/locations`}
+                className="text-brand-secondary-text hover:text-brand-solid font-medium"
+              />
             ),
           }}
         />
@@ -38,7 +42,11 @@ export const OutboundShippingPlaceholder = () => {
           i18nKey="orders.returns.placeholders.outboundShippingOptions.hint"
           components={{
             LinkComponent: (
-              <Link to={`/settings/locations`} className="text-blue-500" />
+              // Wave 2.1 — Happilee link color (brand-secondary-text #4158bd).
+              <Link
+                to={`/settings/locations`}
+                className="text-brand-secondary-text hover:text-brand-solid font-medium"
+              />
             ),
           }}
         />

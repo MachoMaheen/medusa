@@ -1,5 +1,28 @@
+/**
+ * Invite — Happilee Commerce auth screen (Wave 2.7)
+ *
+ * Re-skinned member-invite acceptance flow. Same auth-shell contract as login
+ * and reset-password (§10 of the design handoff spec):
+ *   - centered HappileeCard on bg-ui-bg-subtle page
+ *   - 56px brand-solid AuthBrandMark up top
+ *   - HappileeInput fields, HappileeButton primary submit
+ *   - "Back to login" link with brand-secondary-text styling
+ *
+ * Three sub-views (toggled by JWT validity + signup success):
+ *   1. CreateView   — valid token, render the signup form
+ *   2. SuccessView  — signup succeeded, show a "go to login" CTA
+ *   3. InvalidView  — token expired/malformed, show "back to login" only
+ *
+ * The motion.div fade/scale transitions between CreateView and SuccessView are
+ * preserved; the rigid `557px` height anchor used by the original layout is
+ * dropped because HappileeCard sizes to content and the centered shell
+ * accommodates the natural growth/shrink.
+ *
+ * Backend signup + invite-acceptance hooks untouched. No raw hex literals.
+ */
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Alert, Button, Heading, Hint, Input, Text, toast } from "@medusajs/ui"
+import { Alert, Hint, toast } from "@medusajs/ui"
 import i18n from "i18next"
 import { AnimatePresence, motion } from "motion/react"
 import { useState } from "react"
@@ -9,7 +32,10 @@ import { decodeToken } from "react-jwt"
 import { Link, useSearchParams } from "react-router-dom"
 import * as z from "zod"
 import { Form } from "../../components/common/form"
-import AvatarBox from "../../components/common/logo-box/avatar-box"
+import { HappileeButton } from "../../components/common/happilee-button/happilee-button"
+import { HappileeCard } from "../../components/common/happilee-card/happilee-card"
+import { HappileeInput } from "../../components/common/happilee-input"
+import { AuthBrandMark } from "../login/components/auth-brand-mark"
 import { useSignUpWithEmailPass } from "../../hooks/api/auth"
 import { useAcceptInvite } from "../../hooks/api/invites"
 import { isFetchError } from "../../lib/is-fetch-error"
@@ -41,6 +67,58 @@ type DecodedInvite = {
   email: string
 }
 
+const AuthShell = ({ children }: { children: React.ReactNode }) => (
+  <div
+    data-happilee-auth-shell=""
+    className="bg-ui-bg-subtle flex min-h-dvh w-dvw items-center justify-center p-4"
+  >
+    <HappileeCard
+      as="section"
+      data-happilee-auth-card=""
+      className="w-full max-w-[400px] gap-4 p-6 shadow-hap-md min-h-0"
+    >
+      {children}
+    </HappileeCard>
+  </div>
+)
+
+const AuthHeader = ({ title, hint }: { title: string; hint?: string }) => (
+  <div className="flex flex-col items-center gap-3">
+    <AuthBrandMark />
+    <div className="flex flex-col items-center gap-1">
+      <h1
+        data-happilee-auth-title=""
+        className="text-xl font-semibold leading-7 text-ui-fg-base text-center"
+      >
+        {title}
+      </h1>
+      {hint ? (
+        <p className="text-sm leading-5 text-ui-fg-muted text-center">{hint}</p>
+      ) : null}
+    </div>
+  </div>
+)
+
+const LoginLink = () => {
+  const { t } = useTranslation()
+
+  return (
+    <div className="flex w-full flex-col items-center gap-3">
+      <div
+        aria-hidden="true"
+        className="h-px w-full border-t border-dashed border-ui-border-base"
+      />
+      <Link
+        key="login-link"
+        to="/login"
+        className="text-sm font-medium leading-5 text-brand-secondary-text transition-colors duration-hap-fast hover:text-brand-solid focus-visible:text-brand-solid outline-none"
+      >
+        {t("invite.backToLogin")}
+      </Link>
+    </div>
+  )
+}
+
 export const Invite = () => {
   const [searchParams] = useSearchParams()
   const [success, setSuccess] = useState(false)
@@ -50,100 +128,43 @@ export const Invite = () => {
   const isValidInvite = invite && validateDecodedInvite(invite)
 
   return (
-    <div className="bg-ui-bg-subtle relative flex min-h-dvh w-dvw items-center justify-center p-4">
-      <div className="flex w-full max-w-[360px] flex-col items-center">
-        <AvatarBox checked={success} />
-        <div className="max-h-[557px] w-full will-change-contents">
-          {isValidInvite ? (
-            <AnimatePresence>
-              {!success ? (
-                <motion.div
-                  key="create-account"
-                  initial={false}
-                  animate={{
-                    height: "557px",
-                    y: 0,
-                  }}
-                  exit={{
-                    height: 0,
-                    y: 40,
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.6,
-                    ease: [0, 0.71, 0.2, 1.01],
-                  }}
-                  className="w-full will-change-transform"
-                >
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      opacity: 1,
-                      scale: 1,
-                    }}
-                    exit={{
-                      opacity: 0,
-                      scale: 0.7,
-                    }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0,
-                      ease: [0, 0.71, 0.2, 1.01],
-                    }}
-                    key="inner-create-account"
-                  >
-                    <CreateView
-                      onSuccess={() => setSuccess(true)}
-                      token={token!}
-                      invite={invite}
-                    />
-                  </motion.div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="success-view"
-                  initial={{
-                    opacity: 0,
-                    scale: 0.4,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                  }}
-                  transition={{
-                    duration: 1,
-                    delay: 0.6,
-                    ease: [0, 0.71, 0.2, 1.01],
-                  }}
-                  className="w-full"
-                >
-                  <SuccessView />
-                </motion.div>
-              )}
-            </AnimatePresence>
+    <AuthShell>
+      {isValidInvite ? (
+        <AnimatePresence mode="wait">
+          {!success ? (
+            <motion.div
+              key="create-account"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: [0, 0.71, 0.2, 1.01] }}
+              className="flex w-full flex-col gap-4"
+            >
+              <CreateView
+                onSuccess={() => setSuccess(true)}
+                token={token!}
+                invite={invite}
+              />
+            </motion.div>
           ) : (
-            <InvalidView />
+            <motion.div
+              key="success-view"
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.6,
+                delay: 0.2,
+                ease: [0, 0.71, 0.2, 1.01],
+              }}
+              className="flex w-full flex-col gap-4"
+            >
+              <SuccessView />
+            </motion.div>
           )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const LoginLink = () => {
-  const { t } = useTranslation()
-
-  return (
-    <div className="flex w-full flex-col items-center">
-      <div className="my-6 h-px w-full border-b border-dotted" />
-      <Link
-        key="login-link"
-        to="/login"
-        className="txt-small text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover font-medium outline-none"
-      >
-        {t("invite.backToLogin")}
-      </Link>
-    </div>
+        </AnimatePresence>
+      ) : (
+        <InvalidView />
+      )}
+    </AuthShell>
   )
 }
 
@@ -151,15 +172,13 @@ const InvalidView = () => {
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="flex flex-col items-center gap-y-1">
-        <Heading>{t("invite.invalidTokenTitle")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.invalidTokenHint")}
-        </Text>
-      </div>
+    <>
+      <AuthHeader
+        title={t("invite.invalidTokenTitle")}
+        hint={t("invite.invalidTokenHint")}
+      />
       <LoginLink />
-    </div>
+    </>
   )
 }
 
@@ -242,15 +261,10 @@ const CreateView = ({
     form.formState.errors.last_name?.message
 
   return (
-    <div className="flex w-full flex-col items-center">
-      <div className="mb-4 flex flex-col items-center">
-        <Heading>{t("invite.title")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.hint")}
-        </Text>
-      </div>
+    <>
+      <AuthHeader title={t("invite.title")} hint={t("invite.hint")} />
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-y-6">
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-y-4">
           <div className="flex flex-col gap-y-2">
             <Form.Field
               control={form.control}
@@ -259,10 +273,9 @@ const CreateView = ({
                 return (
                   <Form.Item>
                     <Form.Control>
-                      <Input
+                      <HappileeInput
                         autoComplete="off"
                         {...field}
-                        className="bg-ui-bg-field-component"
                         placeholder={t("fields.email")}
                       />
                     </Form.Control>
@@ -277,10 +290,9 @@ const CreateView = ({
                 return (
                   <Form.Item>
                     <Form.Control>
-                      <Input
+                      <HappileeInput
                         autoComplete="given-name"
                         {...field}
-                        className="bg-ui-bg-field-component"
                         placeholder={t("fields.firstName")}
                       />
                     </Form.Control>
@@ -295,10 +307,9 @@ const CreateView = ({
                 return (
                   <Form.Item>
                     <Form.Control>
-                      <Input
+                      <HappileeInput
                         autoComplete="family-name"
                         {...field}
-                        className="bg-ui-bg-field-component"
                         placeholder={t("fields.lastName")}
                       />
                     </Form.Control>
@@ -313,11 +324,10 @@ const CreateView = ({
                 return (
                   <Form.Item>
                     <Form.Control>
-                      <Input
+                      <HappileeInput
                         autoComplete="new-password"
                         type="password"
                         {...field}
-                        className="bg-ui-bg-field-component"
                         placeholder={t("fields.password")}
                       />
                     </Form.Control>
@@ -332,11 +342,10 @@ const CreateView = ({
                 return (
                   <Form.Item>
                     <Form.Control>
-                      <Input
+                      <HappileeInput
                         autoComplete="off"
                         type="password"
                         {...field}
-                        className="bg-ui-bg-field-component"
                         placeholder={t("fields.repeatPassword")}
                       />
                     </Form.Control>
@@ -345,7 +354,7 @@ const CreateView = ({
               }}
             />
             {validationError && (
-              <div className="mt-6 text-center">
+              <div className="mt-2 text-center">
                 <Hint className="inline-flex" variant={"error"}>
                   {validationError}
                 </Hint>
@@ -361,18 +370,19 @@ const CreateView = ({
               </Alert>
             )}
           </div>
-          <Button
+          <HappileeButton
+            variant="primary"
             className="w-full"
             type="submit"
             isLoading={isCreatingAuthUser || isAcceptingInvite}
             disabled={invalid}
           >
             {t("invite.createAccount")}
-          </Button>
+          </HappileeButton>
         </form>
       </Form>
       <LoginLink />
-    </div>
+    </>
   )
 }
 
@@ -380,27 +390,20 @@ const SuccessView = () => {
   const { t } = useTranslation()
 
   return (
-    <div className="flex w-full flex-col items-center gap-y-6">
-      <div className="flex flex-col items-center gap-y-1">
-        <Heading className="text-center">{t("invite.successTitle")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.successHint")}
-        </Text>
+    <>
+      <AuthHeader
+        title={t("invite.successTitle")}
+        hint={t("invite.successHint")}
+      />
+      <div className="flex w-full flex-col gap-y-3">
+        <HappileeButton variant="secondary" asChild className="w-full">
+          <Link to="/login" replace>
+            {t("invite.successAction")}
+          </Link>
+        </HappileeButton>
       </div>
-      <Button variant="secondary" asChild className="w-full">
-        <Link to="/login" replace>
-          {t("invite.successAction")}
-        </Link>
-      </Button>
-
-      <Link
-        key="login-link"
-        to="/login"
-        className="txt-small text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover font-medium outline-none"
-      >
-        {t("invite.backToLogin")}
-      </Link>
-    </div>
+      <LoginLink />
+    </>
   )
 }
 

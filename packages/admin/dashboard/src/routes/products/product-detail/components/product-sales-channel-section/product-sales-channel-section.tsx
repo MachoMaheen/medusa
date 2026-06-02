@@ -29,10 +29,16 @@ export const ProductSalesChannelSection = ({
   const firstChannels = availableInSalesChannels.slice(0, 3)
   const restChannels = availableInSalesChannels.slice(3)
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="flex flex-col gap-y-4 px-6 py-4">
+    <Container
+      data-happilee-surface="product-sales-channels"
+      className="flex flex-col gap-y-4 px-6 py-4 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs font-sans"
+    >
       <div className="flex items-center justify-between">
-        <Heading level="h2">{t("fields.sales_channels")}</Heading>
+        <Heading level="h2" className="text-ui-fg-base">
+          {t("fields.sales_channels")}
+        </Heading>
         <ActionMenu
           groups={[
             {

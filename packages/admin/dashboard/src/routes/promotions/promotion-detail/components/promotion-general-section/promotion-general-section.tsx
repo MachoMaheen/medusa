@@ -1,22 +1,33 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import {
-  Badge,
-  Container,
-  Copy,
-  Heading,
-  StatusBadge,
-  Text,
-  usePrompt,
-} from "@medusajs/ui"
+import { Container, Copy, Heading, Text, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import {
+  HappileeBadge,
+  HappileeBadgeVariant,
+} from "../../../../../components/common/happilee-badge/happilee-badge"
 import { useDeletePromotion } from "../../../../../hooks/api/promotions"
 import { formatCurrency } from "../../../../../lib/format-currency"
 import { formatPercentage } from "../../../../../lib/percentage-helpers"
 import { getPromotionStatus } from "../../../../../lib/promotions"
+
+/**
+ * Map Medusa StatusBadge `color` keys onto HappileeBadge variants per the
+ * canonical token map (ADR 001 — 2026-06-02). Happilee has three status
+ * variants (active / draft / paused) plus a brand category pill — every
+ * Medusa color key falls into one of those buckets.
+ */
+const STATUS_COLOR_TO_HAPPILEE: Record<string, HappileeBadgeVariant> = {
+  green: "active",
+  red: "paused",
+  orange: "draft",
+  grey: "draft",
+  blue: "brand",
+  purple: "brand",
+}
 
 type PromotionGeneralSectionProps = {
   promotion: HttpTypes.AdminPromotion
@@ -86,7 +97,12 @@ export const PromotionGeneralSection = ({
         </div>
 
         <div className="flex items-center gap-x-2">
-          <StatusBadge color={color}>{text}</StatusBadge>
+          <HappileeBadge
+            variant={STATUS_COLOR_TO_HAPPILEE[color] ?? "draft"}
+            data-testid="promotion-status-badge"
+          >
+            {text}
+          </HappileeBadge>
           <ActionMenu
             groups={[
               {
@@ -129,18 +145,15 @@ export const PromotionGeneralSection = ({
           {t("fields.code")}
         </Text>
 
-        <Copy
-          content={promotion.code!}
-          className="text-ui-tag-neutral-text"
-          asChild
-        >
-          <Badge
-            size="2xsmall"
-            rounded="full"
+        <Copy content={promotion.code!} asChild>
+          <HappileeBadge
+            variant="brand"
+            role="button"
+            tabIndex={0}
             className="cursor-pointer text-pretty"
           >
             {promotion.code}
-          </Badge>
+          </HappileeBadge>
         </Copy>
       </div>
 
@@ -164,9 +177,9 @@ export const PromotionGeneralSection = ({
             {displayValue || "-"}
           </Text>
           {promotion?.application_method?.type === "fixed" && (
-            <Badge size="2xsmall" rounded="full">
+            <HappileeBadge variant="brand">
               {promotion?.application_method?.currency_code?.toUpperCase()}
-            </Badge>
+            </HappileeBadge>
           )}
         </div>
       </div>

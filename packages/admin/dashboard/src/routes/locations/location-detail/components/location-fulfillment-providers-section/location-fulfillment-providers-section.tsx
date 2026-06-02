@@ -1,6 +1,11 @@
+/**
+ * Wave 2.4 — Location → Fulfillment providers sidebar section.
+ *
+ * Re-skinned chrome only. No raw hex literals — Medusa preset `ui-*` map
+ * per `.agent-os/decisions/2026-06-02-canonical-token-map.md`.
+ */
 import { HandTruck, PencilSquare } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading } from "@medusajs/ui"
 import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -25,11 +30,14 @@ function LocationsFulfillmentProvidersSection({
   })
 
   return (
-    <Container className="flex flex-col px-6 py-4">
+    <div
+      data-happilee-section=""
+      className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans flex flex-col px-6 py-4"
+    >
       <div className="flex items-center justify-between">
-        <Heading level="h2">
+        <h2 className="text-base font-semibold leading-6 text-ui-fg-base">
           {t("stockLocations.fulfillmentProviders.header")}
-        </Heading>
+        </h2>
 
         <ActionMenu
           groups={[
@@ -53,10 +61,10 @@ function LocationsFulfillmentProvidersSection({
               return (
                 <Fragment key={fulfillmentProvider.id}>
                   <IconAvatar>
-                    <HandTruck className="text-ui-fg-subtle" />
+                    <HandTruck className="text-ui-fg-muted" />
                   </IconAvatar>
 
-                  <div className="txt-compact-small">
+                  <div className="text-sm text-ui-fg-base">
                     {formatProvider(fulfillmentProvider.id)}
                   </div>
                 </Fragment>
@@ -74,7 +82,7 @@ function LocationsFulfillmentProvidersSection({
           message={t("stockLocations.fulfillmentProviders.noProviders")}
         />
       )}
-    </Container>
+    </div>
   )
 }
 

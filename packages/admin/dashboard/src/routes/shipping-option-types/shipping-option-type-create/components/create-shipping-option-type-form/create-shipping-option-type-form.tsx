@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Heading, Input, Text, toast } from "@medusajs/ui"
+import { Heading, Input, Text, toast } from "@medusajs/ui"
+// Wave 2.6 — primary/secondary footer CTAs use HappileeButton.
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -151,18 +153,18 @@ export const CreateShippingOptionTypeForm = () => {
         <RouteFocusModal.Footer>
           <div className="flex items-center justify-end gap-x-2">
             <RouteFocusModal.Close asChild>
-              <Button size="small" variant="secondary">
+              <HappileeButton size="sm" variant="secondary">
                 {t("actions.cancel")}
-              </Button>
+              </HappileeButton>
             </RouteFocusModal.Close>
-            <Button
-              size="small"
+            <HappileeButton
+              size="sm"
               variant="primary"
               type="submit"
               isLoading={isPending}
             >
               {t("actions.create")}
-            </Button>
+            </HappileeButton>
           </div>
         </RouteFocusModal.Footer>
       </KeyboundForm>

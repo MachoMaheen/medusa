@@ -83,7 +83,8 @@ export function OrderReceiveReturn() {
   return (
     <RouteDrawer>
       <RouteDrawer.Header>
-        <Heading>
+        {/* Wave 2.1 — Happilee drawer-title typography. */}
+        <Heading className="font-sans text-lg font-semibold text-ui-fg-base">
           {t("orders.returns.receive.title", {
             returnId: return_id?.slice(-7),
           })}

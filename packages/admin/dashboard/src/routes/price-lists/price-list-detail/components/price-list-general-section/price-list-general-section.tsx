@@ -1,12 +1,27 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading, StatusBadge, Text } from "@medusajs/ui"
+import { Container, Heading, Text } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import {
+  HappileeBadge,
+  HappileeBadgeVariant,
+} from "../../../../../components/common/happilee-badge/happilee-badge"
 import { useDeletePriceListAction } from "../../../common/hooks/use-delete-price-list-action"
 import { getPriceListStatus } from "../../../common/utils"
 import { usePriceListPrices } from "../../../../../hooks/api"
+
+/**
+ * Price-list statuses come from `getPriceListStatus` as Medusa color names —
+ * map them to the canonical HappileeBadge variant per ADR 001.
+ */
+const STATUS_COLOR_TO_HAPPILEE: Record<string, HappileeBadgeVariant> = {
+  green: "active",
+  red: "paused",
+  orange: "draft",
+  grey: "draft",
+}
 
 type PriceListGeneralSectionProps = {
   priceList: HttpTypes.AdminPriceList
@@ -38,7 +53,12 @@ export const PriceListGeneralSection = ({
       <div className="flex items-center justify-between px-6 py-4">
         <Heading>{priceList.title}</Heading>
         <div className="flex items-center gap-x-4">
-          <StatusBadge color={color}>{text}</StatusBadge>
+          <HappileeBadge
+            variant={STATUS_COLOR_TO_HAPPILEE[color] ?? "draft"}
+            data-testid="price-list-status-badge"
+          >
+            {text}
+          </HappileeBadge>
           <ActionMenu
             groups={[
               {

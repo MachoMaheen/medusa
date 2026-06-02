@@ -1,8 +1,17 @@
-import { Button, Container, Heading, Text } from "@medusajs/ui"
-
+/**
+ * Wave 2.4 — Reservation list page header.
+ *
+ * Re-skins the page chrome around the global `_DataTable`. Heading band
+ * follows the canonical Happilee v3 card pattern (white surface, rounded-xl,
+ * Inter typography) and the primary action becomes a HappileeButton.
+ *
+ * Token discipline: classes route through the Medusa `ui-*` preset (pinned
+ * to Happilee values in `src/styles/happilee-tokens.css`). No raw hex.
+ */
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { _DataTable } from "../../../../../components/table/data-table"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useReservationItems } from "../../../../../hooks/api/reservations"
 import { useDataTable } from "../../../../../hooks/use-data-table"
 import { useReservationTableColumns } from "./use-reservation-table-columns"
@@ -39,17 +48,22 @@ export const ReservationListTable = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div>
-          <Heading>{t("reservations.domain")}</Heading>
-          <Text className="text-ui-fg-subtle" size="small">
+    <div
+      data-happilee-page-shell=""
+      className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans"
+    >
+      <div className="flex items-center justify-between px-6 py-4 border-b border-ui-border-menu-bot">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-base font-semibold leading-6 text-ui-fg-base">
+            {t("reservations.domain")}
+          </h1>
+          <p className="text-sm leading-5 text-ui-fg-muted">
             {t("reservations.subtitle")}
-          </Text>
+          </p>
         </div>
-        <Button variant="secondary" size="small" asChild>
+        <HappileeButton variant="secondary" size="sm" asChild>
           <Link to="create">{t("actions.create")}</Link>
-        </Button>
+        </HappileeButton>
       </div>
       <_DataTable
         table={table}
@@ -62,6 +76,6 @@ export const ReservationListTable = () => {
         navigateTo={(row) => row.id}
         search={false}
       />
-    </Container>
+    </div>
   )
 }

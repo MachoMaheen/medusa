@@ -1,23 +1,30 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { AdminCampaignResponse } from "@medusajs/types"
-import {
-  Badge,
-  Container,
-  Heading,
-  StatusBadge,
-  Text,
-  toast,
-  usePrompt,
-} from "@medusajs/ui"
+import { Container, Heading, Text, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import {
+  HappileeBadge,
+  HappileeBadgeVariant,
+} from "../../../../../components/common/happilee-badge/happilee-badge"
 import { useDeleteCampaign } from "../../../../../hooks/api/campaigns"
 import { currencies } from "../../../../../lib/data/currencies"
 import {
   campaignStatus,
   statusColor,
 } from "../../../common/utils/campaign-status"
+
+/**
+ * Canonical map of campaign status → HappileeBadge variant. Mirrors the map
+ * used by the promotion general section so the two domains read consistently.
+ */
+const STATUS_COLOR_TO_HAPPILEE: Record<string, HappileeBadgeVariant> = {
+  green: "active",
+  red: "paused",
+  orange: "draft",
+  grey: "draft",
+}
 
 type CampaignGeneralSectionProps = {
   campaign: AdminCampaignResponse["campaign"]
@@ -69,9 +76,12 @@ export const CampaignGeneralSection = ({
         <Heading>{campaign.name}</Heading>
 
         <div className="flex items-center gap-x-4">
-          <StatusBadge color={statusColor(status)}>
+          <HappileeBadge
+            variant={STATUS_COLOR_TO_HAPPILEE[statusColor(status)] ?? "draft"}
+            data-testid="campaign-status-badge"
+          >
             {t(`campaigns.status.${status}`)}
-          </StatusBadge>
+          </HappileeBadge>
 
           <ActionMenu
             groups={[
@@ -124,9 +134,11 @@ export const CampaignGeneralSection = ({
             {t("fields.currency")}
           </Text>
 
-          <div>
-            <Badge size="xsmall">{campaign?.budget.currency_code}</Badge>
-            <Text className="inline pl-3" size="small" leading="compact">
+          <div className="flex items-center gap-x-2">
+            <HappileeBadge variant="brand">
+              {campaign?.budget.currency_code}
+            </HappileeBadge>
+            <Text className="inline" size="small" leading="compact">
               {currencies[campaign?.budget.currency_code?.toUpperCase()]?.name}
             </Text>
           </div>

@@ -1,8 +1,23 @@
-import { Button, Container, Heading } from "@medusajs/ui"
+/**
+ * Wave 2.1 — OrderListTable re-skinned to Happilee v3.
+ *
+ * Layout grammar (spec §4.4):
+ *   - Page header row: page title (Heading) on the left, secondary action
+ *     (Export) on the right. Title font + color is governed by the canonical
+ *     ui-* tokens (Heading already maps to text-ui-fg-base = #181d27).
+ *   - Container surface: white card on the page bg-secondary (#fafafa) shell
+ *     background — matches the Happilee "card floats over fafafa" rule.
+ *   - Secondary CTA uses HappileeButton (secondary variant) — white surface,
+ *     border-primary border, brand-secondary-text label.
+ *   - Brand blue (#4d68dc) is reserved for the primary CTA + brand mark only;
+ *     the Export action is intentionally NOT a primary fill.
+ */
+import { Container, Heading } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { Link, Outlet, useLocation } from "react-router-dom"
 
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { _DataTable } from "../../../../../components/table/data-table/data-table"
 import { useOrders } from "../../../../../hooks/api/orders"
 import { useOrderTableColumns } from "../../../../../hooks/table/columns/use-order-table-columns"
@@ -48,12 +63,17 @@ export const OrderListTable = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <Container
+      data-happilee-surface="orders-list"
+      className="divide-y divide-ui-border-menu-bot rounded-xl border border-ui-border-menu-bot bg-ui-bg-base p-0 shadow-hap-xs"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{t("orders.domain")}</Heading>
-        <Button size="small" variant="secondary" asChild>
+        <Heading className="font-sans text-lg font-semibold text-ui-fg-base">
+          {t("orders.domain")}
+        </Heading>
+        <HappileeButton variant="secondary" size="sm" asChild>
           <Link to={`export${location.search}`}>{t("actions.export")}</Link>
-        </Button>
+        </HappileeButton>
       </div>
       <_DataTable
         columns={columns}

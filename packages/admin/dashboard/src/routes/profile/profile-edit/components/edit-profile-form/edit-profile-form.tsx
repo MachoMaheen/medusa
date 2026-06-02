@@ -1,5 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Input, Select, toast } from "@medusajs/ui"
+import { Input, Select, toast } from "@medusajs/ui"
+// Wave 2.6 — swap Medusa Button for the brand-skinned HappileeButton on the
+// modal/drawer footer so the primary CTA renders in Happilee brand-solid blue
+// and the secondary stays the white outlined surface. See
+// .agent-os/decisions/2026-06-02-canonical-token-map.md.
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import * as zod from "zod"
@@ -190,13 +195,13 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
         <RouteDrawer.Footer>
           <div className="flex items-center gap-x-2">
             <RouteDrawer.Close asChild>
-              <Button size="small" variant="secondary">
+              <HappileeButton size="sm" variant="secondary">
                 {t("actions.cancel")}
-              </Button>
+              </HappileeButton>
             </RouteDrawer.Close>
-            <Button size="small" type="submit" isLoading={isPending}>
+            <HappileeButton size="sm" type="submit" isLoading={isPending}>
               {t("actions.save")}
-            </Button>
+            </HappileeButton>
           </div>
         </RouteDrawer.Footer>
       </KeyboundForm>

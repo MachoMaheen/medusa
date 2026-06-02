@@ -1,5 +1,5 @@
 import { GlobeEurope, PencilSquare, Trash } from "@medusajs/icons"
-import { Button, Container, Heading, toast, usePrompt } from "@medusajs/ui"
+import { Container, Heading, toast, usePrompt } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -8,6 +8,7 @@ import { Link, Outlet, useLoaderData, useLocation } from "react-router-dom"
 
 import { HttpTypes } from "@medusajs/types"
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { _DataTable } from "../../../../../components/table/data-table"
 import {
   useDeleteProduct,
@@ -58,20 +59,29 @@ export const ProductListTable = () => {
     throw error
   }
 
+  // Happilee surface — overrides Container's default rounded-lg + shadow-elevation-card-rest
+  // with the canonical Happilee v3 card surface (rounded-xl 12px, hap-xs shadow,
+  // border-ui-border-menu-bot 1px). Every class below traces back to a token in
+  // .agent-os/decisions/2026-06-02-canonical-token-map.md.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h1">{t("products.domain")}</Heading>
+    <Container
+      data-happilee-surface="products-list"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
+        <Heading level="h1" className="text-ui-fg-base">
+          {t("products.domain")}
+        </Heading>
         <div className="flex items-center justify-center gap-x-2">
-          <Button size="small" variant="secondary" asChild>
+          <HappileeButton size="sm" variant="secondary" asChild>
             <Link to={`export${location.search}`}>{t("actions.export")}</Link>
-          </Button>
-          <Button size="small" variant="secondary" asChild>
+          </HappileeButton>
+          <HappileeButton size="sm" variant="secondary" asChild>
             <Link to={`import${location.search}`}>{t("actions.import")}</Link>
-          </Button>
-          <Button size="small" variant="secondary" asChild>
+          </HappileeButton>
+          <HappileeButton size="sm" variant="primary" asChild>
             <Link to="create">{t("actions.create")}</Link>
-          </Button>
+          </HappileeButton>
         </div>
       </div>
       <_DataTable

@@ -1,13 +1,6 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import {
-  Container,
-  Heading,
-  StatusBadge,
-  Text,
-  toast,
-  usePrompt,
-} from "@medusajs/ui"
+import { Heading, Text, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
@@ -15,6 +8,8 @@ import {
   ActionGroup,
   ActionMenu,
 } from "../../../../../components/common/action-menu"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
+import { HappileeBadge } from "../../../../../components/common/happilee-badge/happilee-badge"
 import { useDeleteCustomer } from "../../../../../hooks/api/customers"
 import { useCustomerPermissions } from "../../../../../hooks/use-resource-permissions"
 
@@ -36,7 +31,13 @@ export const CustomerGeneralSection = ({
     .filter(Boolean)
     .join(" ")
 
-  const statusColor = customer.has_account ? "green" : "orange"
+  // Wave 2.3: map the original Medusa StatusBadge color → HappileeBadge variant.
+  //   - has_account  →  "active"  (Happilee green status pill)
+  //   - guest        →  "paused"  (Happilee amber status pill — the closest
+  //                                semantic match to "not yet registered")
+  const statusVariant: "active" | "paused" = customer.has_account
+    ? "active"
+    : "paused"
   const statusText = customer.has_account
     ? t("customers.fields.registered")
     : t("customers.fields.guest")
@@ -99,12 +100,20 @@ export const CustomerGeneralSection = ({
     })
   }
 
+  // Wave 2.3 — Section panel:
+  //   HappileeCard with the same "tall section" overrides used by the customer
+  //   list shell. Rows are separated by the canonical `divide-ui-border-menu-bot`
+  //   so the inner field grid mirrors the original Medusa look while picking up
+  //   the Happilee surface tokens.
   return (
-    <Container className="divide-y p-0">
+    <HappileeCard
+      data-testid="customer-general-section"
+      className="divide-ui-border-menu-bot min-h-0 gap-0 divide-y overflow-hidden p-0"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{customer.email}</Heading>
+        <Heading className="text-ui-fg-base">{customer.email}</Heading>
         <div className="flex items-center gap-x-2">
-          <StatusBadge color={statusColor}>{statusText}</StatusBadge>
+          <HappileeBadge variant={statusVariant}>{statusText}</HappileeBadge>
           {groups.length > 0 && <ActionMenu groups={groups} />}
         </div>
       </div>
@@ -132,6 +141,6 @@ export const CustomerGeneralSection = ({
           {customer.phone || "-"}
         </Text>
       </div>
-    </Container>
+    </HappileeCard>
   )
 }

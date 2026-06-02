@@ -1,5 +1,25 @@
+/**
+ * ResetPassword — Happilee Commerce auth screen (Wave 2.7)
+ *
+ * Three sub-states, all sharing the same auth-shell visual contract from §10
+ * of the design handoff spec:
+ *   1. ResetPasswordRequest — collect email to send reset link
+ *   2. ChooseNewPassword    — token-bearing user picks a new password
+ *   3. InvalidResetToken    — token expired/malformed; offer to re-request
+ *
+ * Shell pattern (identical to login.tsx):
+ *   page    bg-ui-bg-subtle / centered / p-4
+ *   card    HappileeCard, max-w 400px, p-6, shadow-hap-md
+ *   header  56px brand-solid AuthBrandMark + title + hint
+ *   form    HappileeInput fields, HappileeButton primary submit
+ *   footer  "Back to login" link (text-brand-secondary-text)
+ *
+ * Backend logic (hooks, schemas, JWT decode/validation) preserved verbatim;
+ * only chrome/markup changed. No raw hex — every color routes through tokens.
+ */
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Alert, Button, Heading, Input, Text, toast } from "@medusajs/ui"
+import { Alert, toast } from "@medusajs/ui"
 import { useForm } from "react-hook-form"
 import { Trans, useTranslation } from "react-i18next"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
@@ -8,7 +28,10 @@ import * as z from "zod"
 import { useState } from "react"
 import { decodeToken } from "react-jwt"
 import { Form } from "../../components/common/form"
-import { LogoBox } from "../../components/common/logo-box"
+import { HappileeButton } from "../../components/common/happilee-button/happilee-button"
+import { HappileeCard } from "../../components/common/happilee-card/happilee-card"
+import { HappileeInput } from "../../components/common/happilee-input"
+import { AuthBrandMark } from "../login/components/auth-brand-mark"
 import { i18n } from "../../components/utilities/i18n"
 import {
   useResetPasswordForEmailPass,
@@ -54,43 +77,79 @@ const validateDecodedResetPasswordToken = (
   return ResetPasswordTokenSchema.safeParse(decoded).success
 }
 
+/**
+ * Shared Happilee auth shell — bg + centered HappileeCard. Used by every
+ * sub-state of this route so the visual contract stays identical across them.
+ */
+const AuthShell = ({ children }: { children: React.ReactNode }) => (
+  <div
+    data-happilee-auth-shell=""
+    className="bg-ui-bg-subtle flex min-h-dvh w-dvw items-center justify-center p-4"
+  >
+    <HappileeCard
+      as="section"
+      data-happilee-auth-card=""
+      className="w-full max-w-[400px] gap-4 p-6 shadow-hap-md min-h-0"
+    >
+      {children}
+    </HappileeCard>
+  </div>
+)
+
+const AuthHeader = ({ title, hint }: { title: string; hint: string }) => (
+  <div className="flex flex-col items-center gap-3">
+    <AuthBrandMark />
+    <div className="flex flex-col items-center gap-1">
+      <h1
+        data-happilee-auth-title=""
+        className="text-xl font-semibold leading-7 text-ui-fg-base text-center"
+      >
+        {title}
+      </h1>
+      <p className="text-sm leading-5 text-ui-fg-muted text-center">{hint}</p>
+    </div>
+  </div>
+)
+
+const BackToLoginLink = () => (
+  <div className="flex items-center justify-center">
+    <span className="text-sm leading-5 text-ui-fg-muted">
+      <Trans
+        i18nKey="resetPassword.backToLogin"
+        components={[
+          <Link
+            key="login-link"
+            to="/login"
+            className="text-brand-secondary-text transition-colors duration-hap-fast hover:text-brand-solid focus-visible:text-brand-solid font-medium outline-none"
+          />,
+        ]}
+      />
+    </span>
+  </div>
+)
+
 const InvalidResetToken = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
   return (
-    <div className="bg-ui-bg-base flex min-h-dvh w-dvw items-center justify-center">
-      <div className="m-4 flex w-full max-w-[300px] flex-col items-center">
-        <LogoBox className="mb-4" />
-        <div className="mb-6 flex flex-col items-center">
-          <Heading>{t("resetPassword.invalidLinkTitle")}</Heading>
-          <Text size="small" className="text-ui-fg-subtle text-center">
-            {t("resetPassword.invalidLinkHint")}
-          </Text>
-        </div>
-        <div className="flex w-full flex-col gap-y-3">
-          <Button
-            onClick={() => navigate("/reset-password", { replace: true })}
-            className="w-full"
-            type="submit"
-          >
-            {t("resetPassword.goToResetPassword")}
-          </Button>
-        </div>
-        <span className="txt-small my-6">
-          <Trans
-            i18nKey="resetPassword.backToLogin"
-            components={[
-              <Link
-                key="login-link"
-                to="/login"
-                className="text-ui-fg-interactive transition-fg hover:text-ui-fg-interactive-hover focus-visible:text-ui-fg-interactive-hover outline-none"
-              />,
-            ]}
-          />
-        </span>
+    <AuthShell>
+      <AuthHeader
+        title={t("resetPassword.invalidLinkTitle")}
+        hint={t("resetPassword.invalidLinkHint")}
+      />
+      <div className="flex w-full flex-col gap-y-3">
+        <HappileeButton
+          variant="primary"
+          onClick={() => navigate("/reset-password", { replace: true })}
+          className="w-full"
+          type="button"
+        >
+          {t("resetPassword.goToResetPassword")}
+        </HappileeButton>
       </div>
-    </div>
+      <BackToLoginLink />
+    </AuthShell>
   )
 }
 
@@ -143,94 +202,88 @@ const ChooseNewPassword = ({ token }: { token: string }) => {
   }
 
   return (
-    <div className="bg-ui-bg-subtle flex min-h-dvh w-dvw items-center justify-center">
-      <div className="m-4 flex w-full max-w-[280px] flex-col items-center">
-        <LogoBox className="mb-4" />
-        <div className="mb-6 flex flex-col items-center">
-          <Heading>{t("resetPassword.resetPassword")}</Heading>
-          <Text size="small" className="text-ui-fg-subtle text-center">
-            {t("resetPassword.newPasswordHint")}
-          </Text>
-        </div>
-        <div className="flex w-full flex-col gap-y-3">
-          <Form {...form}>
-            <form
-              onSubmit={handleSubmit}
-              className="flex w-full flex-col gap-y-6"
-            >
-              <div className="flex flex-col gap-y-4">
-                <Input type="email" disabled value={invite?.entity_id} />
-                <Form.Field
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => {
-                    return (
-                      <Form.Item>
-                        <Form.Control>
-                          <Input
-                            autoComplete="new-password"
-                            type="password"
-                            {...field}
-                            placeholder={t("resetPassword.newPassword")}
-                          />
-                        </Form.Control>
-                        <Form.ErrorMessage />
-                      </Form.Item>
-                    )
-                  }}
-                />
-                <Form.Field
-                  control={form.control}
-                  name="repeat_password"
-                  render={({ field }) => {
-                    return (
-                      <Form.Item>
-                        <Form.Control>
-                          <Input
-                            autoComplete="off"
-                            type="password"
-                            {...field}
-                            placeholder={t("resetPassword.repeatNewPassword")}
-                          />
-                        </Form.Control>
-                        <Form.ErrorMessage />
-                      </Form.Item>
-                    )
-                  }}
-                />
-              </div>
-              {showAlert && (
-                <Alert dismissible variant="success">
-                  <div className="flex flex-col">
-                    <span className="text-ui-fg-base mb-1">
-                      {t("resetPassword.successfulResetTitle")}
-                    </span>
-                    <span>{t("resetPassword.successfulReset")}</span>
-                  </div>
-                </Alert>
-              )}
-              {!showAlert && (
-                <Button className="w-full" type="submit" isLoading={isPending}>
-                  {t("resetPassword.resetPassword")}
-                </Button>
-              )}
-            </form>
-          </Form>
-        </div>
-        <span className="txt-small my-6">
-          <Trans
-            i18nKey="resetPassword.backToLogin"
-            components={[
-              <Link
-                key="login-link"
-                to="/login"
-                className="text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover outline-none"
-              />,
-            ]}
-          />
-        </span>
+    <AuthShell>
+      <AuthHeader
+        title={t("resetPassword.resetPassword")}
+        hint={t("resetPassword.newPasswordHint")}
+      />
+      <div className="flex w-full flex-col gap-y-3">
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full flex-col gap-y-4"
+          >
+            <div className="flex flex-col gap-y-2">
+              <HappileeInput
+                type="email"
+                disabled
+                value={invite?.entity_id}
+                readOnly
+              />
+              <Form.Field
+                control={form.control}
+                name="password"
+                render={({ field }) => {
+                  return (
+                    <Form.Item>
+                      <Form.Control>
+                        <HappileeInput
+                          autoComplete="new-password"
+                          type="password"
+                          {...field}
+                          placeholder={t("resetPassword.newPassword")}
+                        />
+                      </Form.Control>
+                      <Form.ErrorMessage />
+                    </Form.Item>
+                  )
+                }}
+              />
+              <Form.Field
+                control={form.control}
+                name="repeat_password"
+                render={({ field }) => {
+                  return (
+                    <Form.Item>
+                      <Form.Control>
+                        <HappileeInput
+                          autoComplete="off"
+                          type="password"
+                          {...field}
+                          placeholder={t("resetPassword.repeatNewPassword")}
+                        />
+                      </Form.Control>
+                      <Form.ErrorMessage />
+                    </Form.Item>
+                  )
+                }}
+              />
+            </div>
+            {showAlert && (
+              <Alert dismissible variant="success">
+                <div className="flex flex-col">
+                  <span className="text-ui-fg-base mb-1">
+                    {t("resetPassword.successfulResetTitle")}
+                  </span>
+                  <span>{t("resetPassword.successfulReset")}</span>
+                </div>
+              </Alert>
+            )}
+            {!showAlert && (
+              <HappileeButton
+                variant="primary"
+                className="w-full"
+                type="submit"
+                isLoading={isPending}
+              >
+                {t("resetPassword.resetPassword")}
+              </HappileeButton>
+            )}
+          </form>
+        </Form>
       </div>
-    </div>
+      <BackToLoginLink />
+    </AuthShell>
   )
 }
 
@@ -272,70 +325,57 @@ export const ResetPassword = () => {
   }
 
   return (
-    <div className="bg-ui-bg-base flex min-h-dvh w-dvw items-center justify-center">
-      <div className="m-4 flex w-full max-w-[300px] flex-col items-center">
-        <LogoBox className="mb-4" />
-        <div className="mb-4 flex flex-col items-center">
-          <Heading>{t("resetPassword.resetPassword")}</Heading>
-          <Text size="small" className="text-ui-fg-subtle text-center">
-            {t("resetPassword.hint")}
-          </Text>
-        </div>
-        <div className="flex w-full flex-col gap-y-3">
-          <Form {...form}>
-            <form
-              onSubmit={handleSubmit}
-              className="flex w-full flex-col gap-y-6"
+    <AuthShell>
+      <AuthHeader
+        title={t("resetPassword.resetPassword")}
+        hint={t("resetPassword.hint")}
+      />
+      <div className="flex w-full flex-col gap-y-3">
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full flex-col gap-y-4"
+          >
+            <Form.Field
+              control={form.control}
+              name="email"
+              render={({ field }) => {
+                return (
+                  <Form.Item>
+                    <Form.Control>
+                      <HappileeInput
+                        autoComplete="email"
+                        {...field}
+                        placeholder={t("fields.email")}
+                      />
+                    </Form.Control>
+                    <Form.ErrorMessage />
+                  </Form.Item>
+                )
+              }}
+            />
+            {showAlert && (
+              <Alert dismissible variant="success">
+                <div className="flex flex-col">
+                  <span className="text-ui-fg-base mb-1">
+                    {t("resetPassword.successfulRequestTitle")}
+                  </span>
+                  <span>{t("resetPassword.successfulRequest")}</span>
+                </div>
+              </Alert>
+            )}
+            <HappileeButton
+              variant="primary"
+              className="w-full"
+              type="submit"
+              isLoading={isPending}
             >
-              <div className="mt-4 flex flex-col gap-y-3">
-                <Form.Field
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => {
-                    return (
-                      <Form.Item>
-                        <Form.Control>
-                          <Input
-                            autoComplete="email"
-                            {...field}
-                            placeholder={t("fields.email")}
-                          />
-                        </Form.Control>
-                        <Form.ErrorMessage />
-                      </Form.Item>
-                    )
-                  }}
-                />
-              </div>
-              {showAlert && (
-                <Alert dismissible variant="success">
-                  <div className="flex flex-col">
-                    <span className="text-ui-fg-base mb-1">
-                      {t("resetPassword.successfulRequestTitle")}
-                    </span>
-                    <span>{t("resetPassword.successfulRequest")}</span>
-                  </div>
-                </Alert>
-              )}
-              <Button className="w-full" type="submit" isLoading={isPending}>
-                {t("resetPassword.sendResetInstructions")}
-              </Button>
-            </form>
-          </Form>
-        </div>
-        <span className="txt-small my-6">
-          <Trans
-            i18nKey="resetPassword.backToLogin"
-            components={[
-              <Link
-                key="login-link"
-                to="/login"
-                className="text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover outline-none"
-              />,
-            ]}
-          />
-        </span>
+              {t("resetPassword.sendResetInstructions")}
+            </HappileeButton>
+          </form>
+        </Form>
       </div>
-    </div>
+      <BackToLoginLink />
+    </AuthShell>
   )
 }

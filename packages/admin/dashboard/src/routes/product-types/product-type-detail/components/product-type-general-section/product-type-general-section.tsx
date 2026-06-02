@@ -20,9 +20,13 @@ export const ProductTypeGeneralSection = ({
   )
   const isTranslationsEnabled = useFeatureFlag("translation")
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="flex items-center justify-between">
-      <Heading>{productType.value}</Heading>
+    <Container
+      data-happilee-surface="product-type-general"
+      className="flex items-center justify-between bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs font-sans"
+    >
+      <Heading className="text-ui-fg-base">{productType.value}</Heading>
       <ActionMenu
         groups={[
           {

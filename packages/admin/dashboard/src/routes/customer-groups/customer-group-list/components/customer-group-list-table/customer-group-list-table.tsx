@@ -1,16 +1,12 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import {
-  Container,
-  createDataTableColumnHelper,
-  toast,
-  usePrompt,
-} from "@medusajs/ui"
+import { createDataTableColumnHelper, toast, usePrompt } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
 import { DataTable } from "../../../../../components/data-table"
 import { useDataTableDateFilters } from "../../../../../components/data-table/helpers/general/use-data-table-date-filters"
 import { SingleColumnPage } from "../../../../../components/layout/pages"
@@ -66,7 +62,18 @@ export const CustomerGroupListTable = () => {
         after: getWidgets("customer_group.list.after"),
       }}
     >
-      <Container className="overflow-hidden p-0">
+      {/*
+        Wave 2.3 — Customer-groups list shell.
+        The brief proposed an automation-grid-style HappileeCard layout, but
+        customer groups in Medusa carry tabular data (name + count + dates +
+        actions) that doesn't fit a tile. We keep the DataTable for parity and
+        wrap it in a HappileeCard whose Wave 1 tokens give the surface the
+        Happilee look (white bg, rounded-xl, subtle border, xs shadow).
+      */}
+      <HappileeCard
+        data-testid="customer-groups-list"
+        className="min-h-0 gap-0 overflow-hidden p-0"
+      >
         <DataTable
           data={customer_groups}
           columns={columns}
@@ -92,7 +99,7 @@ export const CustomerGroupListTable = () => {
           pageSize={PAGE_SIZE}
           isLoading={isPending}
         />
-      </Container>
+      </HappileeCard>
     </SingleColumnPage>
   )
 }

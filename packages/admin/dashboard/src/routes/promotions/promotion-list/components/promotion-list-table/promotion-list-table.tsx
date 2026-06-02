@@ -53,9 +53,18 @@ export const PromotionListTable = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <Container
+      className="divide-y divide-ui-border-menu-bot p-0"
+      data-testid="promotions-list-container"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h1">{t("promotions.domain")}</Heading>
+        <Heading
+          level="h1"
+          className="text-ui-fg-base font-semibold"
+          data-testid="promotions-list-heading"
+        >
+          {t("promotions.domain")}
+        </Heading>
 
         <Button size="small" variant="secondary" asChild>
           <Link to="create">{t("actions.create")}</Link>

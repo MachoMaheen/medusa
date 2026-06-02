@@ -38,10 +38,14 @@ export const CollectionGeneralSection = ({
     navigate("../", { replace: true })
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{collection.title}</Heading>
+    <Container
+      data-happilee-surface="collection-general"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
+        <Heading className="text-ui-fg-base">{collection.title}</Heading>
         <ActionMenu
           groups={[
             {

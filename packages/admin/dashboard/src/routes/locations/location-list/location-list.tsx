@@ -1,5 +1,15 @@
+/**
+ * Wave 2.4 — Locations list route.
+ *
+ * Page chrome and sidebar links section are re-skinned to Happilee v3:
+ *   - Main panel: rounded-xl white card surface (`bg-ui-bg-base`) with the
+ *     global DataTable inside.
+ *   - Sidebar: panel chrome carries the Happilee heading style; SidebarLinks
+ *     remain (global primitive, out of scope here).
+ *
+ * Token discipline: routed through Medusa `ui-*` tokens; no raw hex literals.
+ */
 import { ShoppingBag, TruckFast } from "@medusajs/icons"
-import { Container, Heading } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 
 import { useStockLocations } from "../../../hooks/api/stock-locations"
@@ -58,7 +68,10 @@ export function LocationList() {
       showJSON
     >
       <TwoColumnPage.Main>
-        <Container className="flex flex-col divide-y p-0">
+        <div
+          data-happilee-page-shell=""
+          className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans flex flex-col divide-y divide-ui-border-menu-bot"
+        >
           <DataTable
             data={stockLocations}
             columns={columns}
@@ -89,7 +102,7 @@ export function LocationList() {
             prefix={PREFIX}
             layout="fill"
           />
-        </Container>
+        </div>
       </TwoColumnPage.Main>
       <TwoColumnPage.Sidebar>
         <LinksSection />
@@ -102,9 +115,14 @@ const LinksSection = () => {
   const { t } = useTranslation()
 
   return (
-    <Container className="p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("stockLocations.sidebar.header")}</Heading>
+    <div
+      data-happilee-section=""
+      className="bg-ui-bg-base border border-ui-border-menu-bot rounded-xl overflow-hidden font-sans"
+    >
+      <div className="flex items-center justify-between px-6 py-4 border-b border-ui-border-menu-bot">
+        <h2 className="text-base font-semibold leading-6 text-ui-fg-base">
+          {t("stockLocations.sidebar.header")}
+        </h2>
       </div>
 
       <SidebarLink
@@ -123,6 +141,6 @@ const LinksSection = () => {
         )}
         icon={<TruckFast />}
       />
-    </Container>
+    </div>
   )
 }

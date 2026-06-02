@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Heading, Input, Text, Textarea, toast } from "@medusajs/ui"
+import { Heading, Input, Text, Textarea, toast } from "@medusajs/ui"
+// Wave 2.6 — primary/secondary footer CTAs use HappileeButton.
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -142,13 +144,13 @@ export const ReturnReasonCreateForm = () => {
         <RouteFocusModal.Footer>
           <div className="flex items-center justify-end gap-2">
             <RouteFocusModal.Close asChild>
-              <Button size="small" variant="secondary" type="button">
+              <HappileeButton size="sm" variant="secondary" type="button">
                 {t("actions.cancel")}
-              </Button>
+              </HappileeButton>
             </RouteFocusModal.Close>
-            <Button size="small" type="submit" isLoading={isPending}>
+            <HappileeButton size="sm" type="submit" isLoading={isPending}>
               {t("actions.save")}
-            </Button>
+            </HappileeButton>
           </div>
         </RouteFocusModal.Footer>
       </KeyboundForm>

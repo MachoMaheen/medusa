@@ -1,12 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import {
-  Button,
-  Checkbox,
-  Container,
-  Heading,
-  toast,
-  usePrompt,
-} from "@medusajs/ui"
+import { Checkbox, Heading, toast, usePrompt } from "@medusajs/ui"
 import { RowSelectionState, createColumnHelper } from "@tanstack/react-table"
 import { t } from "i18next"
 import { useMemo, useState } from "react"
@@ -20,6 +13,8 @@ import {
   Action,
   ActionMenu,
 } from "../../../../../components/common/action-menu"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { PermissionGuard } from "../../../../../components/common/permission-guard"
 import { _DataTable } from "../../../../../components/table/data-table"
 import { useBatchCustomerCustomerGroups } from "../../../../../hooks/api"
@@ -137,15 +132,21 @@ export const CustomerGroupSection = ({
       ]
     : []
 
+  // Wave 2.3 — Customer-groups panel: same recipe.
   return (
-    <Container className="divide-y p-0">
+    <HappileeCard
+      data-testid="customer-groups-section"
+      className="divide-ui-border-menu-bot min-h-0 gap-0 divide-y overflow-hidden p-0"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("customerGroups.domain")}</Heading>
+        <Heading level="h2" className="text-ui-fg-base">
+          {t("customerGroups.domain")}
+        </Heading>
         <PermissionGuard resource="customer" operation="update">
           <Link to={`/customers/${customer.id}/add-customer-groups`}>
-            <Button variant="secondary" size="small">
+            <HappileeButton variant="secondary" size="sm">
               {t("general.add")}
-            </Button>
+            </HappileeButton>
           </Link>
         </PermissionGuard>
       </div>
@@ -171,7 +172,7 @@ export const CustomerGroupSection = ({
           message: t("customers.groups.list.noRecordsMessage"),
         }}
       />
-    </Container>
+    </HappileeCard>
   )
 }
 

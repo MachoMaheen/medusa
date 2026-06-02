@@ -1,6 +1,6 @@
 import { GlobeEurope, PencilSquare, Trash } from "@medusajs/icons"
 import { AdminProductCategoryResponse } from "@medusajs/types"
-import { Button, Container, Heading, Text } from "@medusajs/ui"
+import { Container, Heading, Text } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 
 import { Link } from "react-router-dom"
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { _DataTable } from "../../../../../components/table/data-table"
 import { useProductCategories } from "../../../../../hooks/api/categories"
 import { useDataTable } from "../../../../../hooks/use-data-table"
@@ -65,24 +66,28 @@ export const CategoryListTable = () => {
     throw error
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
+    <Container
+      data-happilee-surface="categories-list"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
         <div>
-          <Heading>{t("categories.domain")}</Heading>
-          <Text className="text-ui-fg-subtle" size="small">
+          <Heading className="text-ui-fg-base">{t("categories.domain")}</Heading>
+          <Text className="text-ui-fg-muted" size="small">
             {t("categories.subtitle")}
           </Text>
         </div>
         <div className="flex items-center gap-x-2">
           {showRankingAction && (
-            <Button size="small" variant="secondary" asChild>
+            <HappileeButton size="sm" variant="secondary" asChild>
               <Link to="organize">{t("categories.organize.action")}</Link>
-            </Button>
+            </HappileeButton>
           )}
-          <Button size="small" variant="secondary" asChild>
+          <HappileeButton size="sm" variant="primary" asChild>
             <Link to="create">{t("actions.create")}</Link>
-          </Button>
+          </HappileeButton>
         </div>
       </div>
       <_DataTable

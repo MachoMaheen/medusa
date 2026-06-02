@@ -83,10 +83,16 @@ export const ProductMediaSection = ({ product }: ProductMedisaSectionProps) => {
     )
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("products.media.label")}</Heading>
+    <Container
+      data-happilee-surface="product-media"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
+        <Heading level="h2" className="text-ui-fg-base">
+          {t("products.media.label")}
+        </Heading>
         <ActionMenu
           groups={[
             {

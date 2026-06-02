@@ -48,9 +48,18 @@ export const CampaignListTable = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <Container
+      className="divide-y divide-ui-border-menu-bot p-0"
+      data-testid="campaigns-list-container"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h1">{t("campaigns.domain")}</Heading>
+        <Heading
+          level="h1"
+          className="text-ui-fg-base font-semibold"
+          data-testid="campaigns-list-heading"
+        >
+          {t("campaigns.domain")}
+        </Heading>
         <Link to="/campaigns/create">
           <Button size="small" variant="secondary">
             {t("actions.create")}

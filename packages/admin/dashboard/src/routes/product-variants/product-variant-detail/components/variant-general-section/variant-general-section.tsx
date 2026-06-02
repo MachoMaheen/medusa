@@ -1,9 +1,10 @@
 import { Component, GlobeEurope, PencilSquare, Trash } from "@medusajs/icons"
-import { Badge, Container, Heading, usePrompt } from "@medusajs/ui"
+import { Container, Heading, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import { HappileeBadge } from "../../../../../components/common/happilee-badge/happilee-badge"
 import { SectionRow } from "../../../../../components/common/section"
 import { useDeleteVariant } from "../../../../../hooks/api/products"
 import { useFeatureFlag } from "../../../../../providers/feature-flag-provider"
@@ -44,19 +45,23 @@ export function VariantGeneralSection({ variant }: VariantGeneralSectionProps) {
     })
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
+    <Container
+      data-happilee-surface="variant-general"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
         <div>
           <div className="flex items-center gap-2">
-            <Heading>{variant.title}</Heading>
+            <Heading className="text-ui-fg-base">{variant.title}</Heading>
             {hasInventoryKit && (
               <span className="text-ui-fg-muted font-normal">
                 <Component />
               </span>
             )}
           </div>
-          <span className="text-ui-fg-subtle txt-small mt-2">
+          <span className="text-ui-fg-muted txt-small mt-2">
             {t("labels.productVariant")}
           </span>
         </div>
@@ -104,7 +109,7 @@ export function VariantGeneralSection({ variant }: VariantGeneralSectionProps) {
         <SectionRow
           key={o.id}
           title={o.option?.title!}
-          value={<Badge size="2xsmall">{o.value}</Badge>}
+          value={<HappileeBadge variant="brand">{o.value}</HappileeBadge>}
         />
       ))}
     </Container>

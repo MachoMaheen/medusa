@@ -1,6 +1,6 @@
 import { GlobeEurope, PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Button, Container, Heading } from "@medusajs/ui"
+import { Container, Heading } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 import { Link, useLoaderData } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { _DataTable } from "../../../../../components/table/data-table"
 import { useProductTags } from "../../../../../hooks/api"
 import { useProductTagTableColumns } from "../../../../../hooks/table/columns"
@@ -53,13 +54,19 @@ export const ProductTagListTable = () => {
     throw error
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y px-0 py-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{t("productTags.domain")}</Heading>
-        <Button variant="secondary" size="small" asChild>
+    <Container
+      data-happilee-surface="product-tags-list"
+      className="divide-y px-0 py-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
+      <div className="flex items-center justify-between px-6 py-4 font-sans">
+        <Heading className="text-ui-fg-base">
+          {t("productTags.domain")}
+        </Heading>
+        <HappileeButton variant="primary" size="sm" asChild>
           <Link to="create">{t("actions.create")}</Link>
-        </Button>
+        </HappileeButton>
       </div>
       <_DataTable
         table={table}

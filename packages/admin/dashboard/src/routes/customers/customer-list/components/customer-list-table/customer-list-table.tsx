@@ -1,5 +1,5 @@
 import { PencilSquare } from "@medusajs/icons"
-import { Button, Container, Heading } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
 import { keepPreviousData } from "@tanstack/react-query"
 import { createColumnHelper } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -11,6 +11,8 @@ import {
   Action,
   ActionMenu,
 } from "../../../../../components/common/action-menu"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { PermissionGuard } from "../../../../../components/common/permission-guard"
 import { _DataTable } from "../../../../../components/table/data-table"
 import { useCustomers } from "../../../../../hooks/api/customers"
@@ -51,15 +53,29 @@ export const CustomerListTable = () => {
     throw error
   }
 
+  // Wave 2.3 — Customer list shell:
+  //   The HappileeCard primitive paints the canonical Happilee surface
+  //   (bg-ui-bg-base / border-ui-border-menu-bot / rounded-xl / shadow-hap-xs).
+  //   The list view is a tall stacked frame, so we override the primitive's
+  //   defaults that target the smaller automation-tile use-case:
+  //     - p-0          : the inner data-table provides its own padding
+  //     - min-h-0      : disable the 140px min-height (list is tall already)
+  //     - gap-0        : sections are separated by Medusa's `divide-y` lines
+  //     - divide-y     : 1px dividers between the heading band and the table
+  //   All tokens trace back to the canonical map at
+  //   `.agent-os/decisions/2026-06-02-canonical-token-map.md` — no raw hex.
   return (
-    <Container className="divide-y p-0">
-      <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{t("customers.domain")}</Heading>
+    <HappileeCard className="divide-ui-border-menu-bot min-h-0 gap-0 divide-y overflow-hidden p-0">
+      <div
+        data-testid="customers-list-header"
+        className="flex items-center justify-between px-6 py-4"
+      >
+        <Heading className="text-ui-fg-base">{t("customers.domain")}</Heading>
         <PermissionGuard resource="customer" operation="create">
           <Link to="/customers/create">
-            <Button size="small" variant="secondary">
+            <HappileeButton size="sm" variant="secondary">
               {t("actions.create")}
-            </Button>
+            </HappileeButton>
           </Link>
         </PermissionGuard>
       </div>
@@ -85,7 +101,7 @@ export const CustomerListTable = () => {
           message: t("customers.list.noRecordsMessage"),
         }}
       />
-    </Container>
+    </HappileeCard>
   )
 }
 

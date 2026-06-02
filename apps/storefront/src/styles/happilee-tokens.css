@@ -1,0 +1,123 @@
+/**
+ * Happilee Commerce — token overrides for Medusa's @medusajs/ui-preset
+ *
+ * Overrides Medusa's `--<token>` CSS variables (defined in
+ * packages/design-system/ui-preset/src/theme/tokens/colors.ts) with Happilee
+ * v3 values from `~/.claude/skills/happilee-v3-design-system/`.
+ *
+ * Strategy: target the :root scope so every @medusajs/ui component inherits
+ * the new look without us editing any Medusa package. Backend stays pristine.
+ *
+ * Reference: ~/.claude/skills/happilee-v3-design-system/references/tokens.md
+ */
+
+:root {
+  /* ── Backgrounds ─────────────────────────────────────────────────────── */
+  --bg-base: 255 255 255;              /* Happilee bg-primary (#ffffff) — card surface */
+  --bg-base-hover: 250 250 250;        /* Happilee bg-secondary (#fafafa) on hover */
+  --bg-subtle: 250 250 250;            /* Happilee bg-secondary — page background */
+  --bg-subtle-hover: 245 245 245;
+  --bg-subtle-pressed: 240 240 240;
+  --bg-component: 255 255 255;
+  --bg-component-hover: 250 250 250;
+  --bg-component-pressed: 245 245 245;
+  --bg-field: 255 255 255;
+  --bg-field-hover: 250 250 250;
+  --bg-field-component: 255 255 255;
+  --bg-field-component-hover: 250 250 250;
+  --bg-overlay: 0 0 0 / 0.30;          /* Happilee alpha-black-30 — modal backdrop */
+  --bg-disabled: 250 250 250;
+
+  /* ── Foreground / text ───────────────────────────────────────────────── */
+  --fg-base: 24 29 39;                 /* Happilee text-primary (#181d27) */
+  --fg-subtle: 65 70 81;               /* Happilee text-secondary (#414651) */
+  --fg-muted: 113 118 128;             /* Happilee text-quaternary (#717680) */
+  --fg-disabled: 164 167 174;          /* Happilee #a4a7ae */
+  --fg-on-color: 255 255 255;
+  --fg-on-inverted: 255 255 255;
+
+  /* ── Brand / Interactive ─────────────────────────────────────────────── */
+  --bg-interactive: 77 104 220;        /* Happilee brand-solid (#4d68dc) — primary CTA */
+  --fg-interactive: 65 88 189;         /* Happilee brand-secondary-text (#4158bd) — links */
+  --fg-interactive-hover: 93 123 241;  /* Happilee brand-secondary-fg (#5d7bf1) */
+  --border-interactive: 77 104 220;
+
+  /* Highlight = the calm selected state (brand-light fill) */
+  --bg-highlight: 237 242 254;         /* Happilee brand-light (#edf2fe) */
+  --bg-highlight-hover: 228 235 253;
+
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --border-base: 213 215 218;          /* Happilee border-primary (#d5d7da) */
+  --border-strong: 213 215 218;
+  --border-loud: 213 215 218;
+  --border-transparent: 0 0 0 / 0;
+  --border-menu-bot: 233 234 235;      /* Happilee border-secondary (#e9eaeb) */
+  --border-menu-top: 233 234 235;
+  --contrast-border-base: 0 0 0 / 0.08; /* Happilee border-secondary-alt */
+
+  /* ── Status tags — Active (green) ────────────────────────────────────── */
+  --tag-green-bg: 240 253 244;         /* Happilee status-active-bg */
+  --tag-green-bg-hover: 220 252 231;
+  --tag-green-border: 187 247 208;     /* Happilee status-active-border */
+  --tag-green-text: 21 128 61;         /* Happilee status-active-text */
+  --tag-green-icon: 22 163 74;         /* Happilee fg-success-primary */
+
+  /* ── Status tags — Draft (slate) — mapped to neutral ────────────────── */
+  --tag-neutral-bg: 248 250 252;
+  --tag-neutral-bg-hover: 241 245 249;
+  --tag-neutral-border: 226 232 240;
+  --tag-neutral-text: 51 65 85;
+  --tag-neutral-icon: 100 116 139;
+
+  /* ── Status tags — Paused (amber) — mapped to orange ─────────────────── */
+  --tag-orange-bg: 255 251 235;
+  --tag-orange-bg-hover: 254 243 199;
+  --tag-orange-border: 253 230 138;
+  --tag-orange-text: 180 83 9;
+  --tag-orange-icon: 245 158 11;
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  --button-neutral: 0 0 0 / 0;
+  --button-neutral-hover: 0 0 0 / 0.05;
+  --button-neutral-pressed: 0 0 0 / 0.08;
+  --button-inverted: 77 104 220;
+  --button-inverted-hover: 65 88 189;
+  --button-inverted-pressed: 51 73 169;
+  --button-transparent: 0 0 0 / 0;
+  --button-transparent-hover: 0 0 0 / 0.05;
+  --button-transparent-pressed: 0 0 0 / 0.08;
+  --button-danger: 220 38 38;
+  --button-danger-hover: 185 28 28;
+  --button-danger-pressed: 153 27 27;
+
+  /* ── Errors ──────────────────────────────────────────────────────────── */
+  --fg-error: 220 38 38;
+  --border-error: 220 38 38;
+  --border-danger: 220 38 38;
+
+  /* ── Alpha utilities ─────────────────────────────────────────────────── */
+  --alpha-400: 0 0 0 / 0.24;
+  --alpha-250: 0 0 0 / 0.10;
+
+  /* ── Switch ──────────────────────────────────────────────────────────── */
+  --bg-switch-off: 213 215 218;
+  --bg-switch-off-hover: 164 167 174;
+}
+
+/* Force light mode — Happilee v3 is light-only. Override Medusa's dark-mode toggle. */
+:root.dark,
+.dark,
+html.dark {
+  /* Use the same light values — disables dark mode entirely */
+  --bg-base: 255 255 255;
+  --bg-subtle: 250 250 250;
+  --fg-base: 24 29 39;
+  --fg-subtle: 65 70 81;
+  --fg-muted: 113 118 128;
+  --bg-interactive: 77 104 220;
+  --fg-interactive: 65 88 189;
+  --bg-highlight: 237 242 254;
+  --border-base: 213 215 218;
+  --border-menu-bot: 233 234 235;
+  --border-menu-top: 233 234 235;
+}

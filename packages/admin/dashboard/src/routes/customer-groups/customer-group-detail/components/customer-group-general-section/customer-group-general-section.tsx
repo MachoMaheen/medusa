@@ -1,10 +1,11 @@
 import { PencilSquare, Trash } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Container, Heading, Text, toast, usePrompt } from "@medusajs/ui"
+import { Heading, Text, toast, usePrompt } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { ActionMenu } from "../../../../../components/common/action-menu"
+import HappileeCard from "../../../../../components/common/happilee-card/happilee-card"
 import { useDeleteCustomerGroup } from "../../../../../hooks/api/customer-groups"
 
 type CustomerGroupGeneralSectionProps = {
@@ -50,10 +51,14 @@ export const CustomerGroupGeneralSection = ({
     })
   }
 
+  // Wave 2.3 — Group general section card.
   return (
-    <Container className="divide-y p-0">
+    <HappileeCard
+      data-testid="customer-group-general-section"
+      className="divide-ui-border-menu-bot min-h-0 gap-0 divide-y overflow-hidden p-0"
+    >
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading>{group.name}</Heading>
+        <Heading className="text-ui-fg-base">{group.name}</Heading>
         <ActionMenu
           groups={[
             {
@@ -85,6 +90,6 @@ export const CustomerGroupGeneralSection = ({
           {group.customers?.length || "-"}
         </Text>
       </div>
-    </Container>
+    </HappileeCard>
   )
 }

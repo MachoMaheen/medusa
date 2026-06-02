@@ -7,7 +7,6 @@ import {
 } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import {
-  Badge,
   clx,
   Container,
   createDataTableColumnHelper,
@@ -17,6 +16,7 @@ import {
   Tooltip,
   usePrompt,
 } from "@medusajs/ui"
+import { HappileeBadge } from "../../../../../components/common/happilee-badge/happilee-badge"
 import { keepPreviousData } from "@tanstack/react-query"
 import { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
@@ -87,8 +87,12 @@ export const ProductVariantSection = ({
     throw error
   }
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="divide-y p-0">
+    <Container
+      data-happilee-surface="product-variants"
+      className="divide-y p-0 bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs"
+    >
       <DataTable
         data={variants}
         columns={columns}
@@ -209,13 +213,13 @@ const useColumns = (product: HttpTypes.AdminProduct) => {
           return (
             <div className="flex items-center">
               <Tooltip content={variantOpt.value}>
-                <Badge
-                  size="2xsmall"
+                <HappileeBadge
+                  variant="brand"
                   title={variantOpt.value}
                   className="inline-flex min-w-[20px] max-w-[140px] items-center justify-center overflow-hidden truncate"
                 >
                   {variantOpt.value}
-                </Badge>
+                </HappileeBadge>
               </Tooltip>
             </div>
           )

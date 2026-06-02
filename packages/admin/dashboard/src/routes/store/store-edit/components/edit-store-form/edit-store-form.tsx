@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { HttpTypes } from "@medusajs/types"
-import { Button, Input, Select, toast } from "@medusajs/ui"
+import { Input, Select, toast } from "@medusajs/ui"
+// Wave 2.6 — primary/secondary footer CTAs use HappileeButton.
+import { HappileeButton } from "../../../../../components/common/happilee-button/happilee-button"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -217,13 +219,13 @@ export const EditStoreForm = ({ store }: EditStoreFormProps) => {
         <RouteDrawer.Footer>
           <div className="flex items-center justify-end gap-x-2">
             <RouteDrawer.Close asChild>
-              <Button size="small" variant="secondary">
+              <HappileeButton size="sm" variant="secondary">
                 {t("actions.cancel")}
-              </Button>
+              </HappileeButton>
             </RouteDrawer.Close>
-            <Button size="small" isLoading={isPending} type="submit">
+            <HappileeButton size="sm" isLoading={isPending} type="submit">
               {t("actions.save")}
-            </Button>
+            </HappileeButton>
           </div>
         </RouteDrawer.Footer>
       </KeyboundForm>

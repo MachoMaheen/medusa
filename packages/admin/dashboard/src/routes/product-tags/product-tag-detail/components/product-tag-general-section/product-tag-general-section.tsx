@@ -17,11 +17,15 @@ export const ProductTagGeneralSection = ({
   const handleDelete = useDeleteProductTagAction({ productTag })
   const isTranslationsEnabled = useFeatureFlag("translation")
 
+  // Happilee re-skin — see canonical-token-map.md for class rationale.
   return (
-    <Container className="flex items-center justify-between">
+    <Container
+      data-happilee-surface="product-tag-general"
+      className="flex items-center justify-between bg-ui-bg-base border border-ui-border-menu-bot rounded-xl shadow-hap-xs font-sans"
+    >
       <div className="flex items-center gap-x-1.5">
         <span className="text-ui-fg-muted h1-core">#</span>
-        <Heading>{productTag.value}</Heading>
+        <Heading className="text-ui-fg-base">{productTag.value}</Heading>
       </div>
       <ActionMenu
         groups={[

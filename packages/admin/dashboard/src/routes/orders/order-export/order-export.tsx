@@ -1,5 +1,16 @@
-import { Button, Heading, toast } from "@medusajs/ui"
+/**
+ * Wave 2.1 — Order Export drawer re-skinned to Happilee v3.
+ *
+ * RouteDrawer chrome is shell-managed (its surface, border, and shadow already
+ * trace back to the canonical ui-* token map). We only need to:
+ *   - apply Happilee typography to the drawer title (text-lg semibold ui-fg-base)
+ *   - swap the action buttons to HappileeButton (primary fill for the
+ *     confirmatory "Export" CTA — the only place brand-solid is allowed on
+ *     this surface — and secondary for "Cancel").
+ */
+import { Heading, toast } from "@medusajs/ui"
 import { useTranslation } from "react-i18next"
+import { HappileeButton } from "../../../components/common/happilee-button/happilee-button"
 import { RouteDrawer, useRouteModal } from "../../../components/modals"
 import { useExportOrders } from "../../../hooks/api"
 import { useOrderTableQuery } from "../../../hooks/table/query"
@@ -12,7 +23,9 @@ export const OrderExport = () => {
     <RouteDrawer>
       <RouteDrawer.Header>
         <RouteDrawer.Title asChild>
-          <Heading>{t("orders.export.header")}</Heading>
+          <Heading className="font-sans text-lg font-semibold text-ui-fg-base">
+            {t("orders.export.header")}
+          </Heading>
         </RouteDrawer.Title>
         <RouteDrawer.Description className="sr-only">
           {t("orders.export.description")}
@@ -52,13 +65,17 @@ const OrderExportContent = () => {
       <RouteDrawer.Footer>
         <div className="flex items-center gap-x-2">
           <RouteDrawer.Close asChild>
-            <Button size="small" variant="secondary">
+            <HappileeButton variant="secondary" size="sm">
               {t("actions.cancel")}
-            </Button>
+            </HappileeButton>
           </RouteDrawer.Close>
-          <Button onClick={handleExportRequest} size="small">
+          <HappileeButton
+            variant="primary"
+            size="sm"
+            onClick={handleExportRequest}
+          >
             {t("actions.export")}
-          </Button>
+          </HappileeButton>
         </div>
       </RouteDrawer.Footer>
     </>

@@ -21,7 +21,10 @@ export const OrderCreateRefund = () => {
   return (
     <RouteDrawer>
       <RouteDrawer.Header>
-        <Heading>{t("orders.payment.createRefund")}</Heading>
+        {/* Wave 2.1 — Happilee drawer-title typography. */}
+        <Heading className="font-sans text-lg font-semibold text-ui-fg-base">
+          {t("orders.payment.createRefund")}
+        </Heading>
       </RouteDrawer.Header>
 
       {order && !loyaltyPlugin && <CreateRefundForm order={order} />}
