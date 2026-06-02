@@ -370,26 +370,33 @@ function HappileeSideNav() {
   const tier1Items = useTier1Items()
 
   // Determine which tier-1 is "active" based on the current URL segment.
+  // We match on the first path segment AND on any tier-two child whose path
+  // starts with `/<firstSegment>`. This keeps nested resource routes like
+  // `/products/abc/edit` or `/customer-groups/xyz` highlighting the right
+  // tier-1 entry.
   const firstSegment = location.pathname.split("/").filter(Boolean)[0] ?? ""
+  const segmentPrefix = firstSegment ? `/${firstSegment}` : "/"
   const activeTier1 =
     tier1Items.find((item) => {
       if (item.to === "/") return firstSegment === ""
+      if (item.to === segmentPrefix) return true
       return (
-        item.to === `/${firstSegment}` ||
-        (item.tierTwo?.some((c) => c.to.startsWith(`/${firstSegment}`)) ??
-          false)
+        item.tierTwo?.some(
+          (c) => c.to === segmentPrefix || c.to.startsWith(`${segmentPrefix}/`)
+        ) ?? false
       )
     }) ?? tier1Items[0]
 
+  // Tier-two panel is shown only at >= 1024px (full mode). At <= 1023px we
+  // collapse to the 56px rail.
+  //
+  // Note: we no longer short-circuit to `null` for `mode === "hidden"`. The
+  // Shell wraps this same SideNav inside the mobile <RadixDialog> drawer, so
+  // returning null leaves mobile users with an empty drawer. Instead we keep
+  // rendering the rail (the desktop `hidden sm:block` wrapper still hides it
+  // outside the drawer at < 640px) and let the drawer host the same rail UI.
   const isFull = mode === "full"
-  const isHidden = mode === "hidden"
   const showTierTwo = isFull && !!activeTier1.tierTwo?.length
-
-  if (isHidden) {
-    // The Shell's mobile drawer wraps <MainLayout> children for < 640px,
-    // so the SideNav is intentionally not rendered here.
-    return null
-  }
 
   return (
     <div className="flex h-full">
