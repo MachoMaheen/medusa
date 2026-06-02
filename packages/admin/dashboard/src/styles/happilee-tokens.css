@@ -70,9 +70,12 @@
   --border-transparent: rgba(0, 0, 0, 0);
 
   /* ── Buttons ──────────────────────────────────────────────────────── */
-  --button-inverted: #181d27;
-  --button-inverted-hover: #414651;
-  --button-inverted-pressed: #535862;
+  /* Medusa's "inverted" button is the primary CTA on light surfaces.
+     Repointing to Happilee brand blue so every primary button (Continue
+     with Email, Save, Create, etc.) renders #4d68dc instead of dark text. */
+  --button-inverted: #4d68dc;
+  --button-inverted-hover: #4158bd;
+  --button-inverted-pressed: #3b4fb0;
   --button-neutral: #ffffff;
   --button-neutral-hover: #fafafa;
   --button-neutral-pressed: #f5f5f5;
