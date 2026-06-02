@@ -13,6 +13,9 @@ import "./index.css"
 // resolve later in the cascade than Medusa's preset CSS variables.
 import "./styles/happilee-tokens.css"
 import "./styles/happilee-fonts.css"
+// Aggressive CSS-only restyle of Medusa's sidebar/shell into the
+// Happilee 56px rail look — must come LAST so it overrides preset + tokens.
+import "./styles/happilee-shell-restyle.css"
 
 const localPlugin = {
   widgetModule,

@@ -1,0 +1,475 @@
+/* Happilee v3 — CSS-only aggressive shell restyle (Option B)
+   Repaints Medusa's existing sidebar/aside DOM into the Happilee
+   56px rail look WITHOUT touching any .tsx file. Builds on top of
+   happilee-tokens.css (CSS vars + Inter font).
+
+   Reference: ~/.claude/skills/happilee-v3-design-system/references/sidebar.md
+   Five non-negotiables enforced:
+     1. Brand blue (#4d68dc) confined to the workspace mark
+     2. Inter only (inherited from tokens overlay)
+     3. Page bg #fafafa, card surfaces white (already in tokens overlay)
+     4. Selected = brand-light (#edf2fe) fill + brand-secondary-text (#4158bd)
+     5. Radii on the 6 / 8 / 12 / full scale
+
+   Selector strategy:
+     • The DesktopSidebarContainer is the ONLY div in the shell that uses
+       the Tailwind utility `w-[220px]`. Use [class~="w-[220px]"] to grab it
+       deterministically without TSX edits.
+     • Inside it Medusa renders <aside class="flex flex-1 flex-col …">.
+       All shell rules are nested under that aside so we never bleed onto
+       drawers / modals that share Tailwind utility classes.
+*/
+
+/* ── 1. Shrink the desktop sidebar container 220px → 56px ─────────── */
+.hap-shell-root [class~="w-\[220px\]"],
+[class~="w-\[220px\]"]:has(> aside) {
+  width: 56px !important;
+  border-right: 1px solid var(--border-menu-bot) !important;
+  border-inline-end: 1px solid var(--border-menu-bot) !important;
+}
+
+/* The mobile drawer (RadixDialog.Content) keeps its 304px width so the
+   mobile fly-out still works. We intentionally only target the desktop
+   container above by requiring it to wrap a direct <aside> child. */
+
+/* ── 2. Aside: white surface, no scroll chrome, rail layout ────────── */
+[class~="w-\[220px\]"]:has(> aside) > aside {
+  background-color: var(--bg-base) !important;        /* white */
+  width: 56px !important;
+  overflow-x: hidden !important;
+}
+
+/* Inner sticky bands (Header band + UserSection band) also need to
+   collapse to 56px and lose the muted bg so the rail is pure white. */
+[class~="w-\[220px\]"]:has(> aside) aside .bg-ui-bg-subtle.sticky {
+  background-color: var(--bg-base) !important;
+}
+
+/* ── 3. Workspace switcher → 40×40 brand square with "H" glyph ─────── */
+/* Header() renders: <div class="w-full p-3"><DropdownMenu.Trigger
+   class="… grid w-full grid-cols-[24px_1fr_15px] …"> … </Trigger></div>
+   We collapse the grid to a single 40×40 brand square, hide the M-avatar
+   and ellipsis, and inject a white "H" via ::after. */
+[class~="w-\[220px\]"]:has(> aside) aside .w-full.p-3 {
+  padding: 8px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  [class*="grid-cols-\[24px_1fr_15px\]"] {
+  display: flex !important;
+  grid-template-columns: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  background-color: var(--brand-solid) !important;   /* #4d68dc */
+  border-radius: var(--radii-xl) !important;          /* 12px */
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  gap: 0 !important;
+}
+
+/* Hide the original avatar/store-name/ellipsis children. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  [class*="grid-cols-\[24px_1fr_15px\]"] > * {
+  display: none !important;
+}
+
+/* Inject the white "H" brand mark. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  [class*="grid-cols-\[24px_1fr_15px\]"]::after {
+  content: "H";
+  display: block;
+  color: var(--fg-on-color);                          /* white */
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* Hover keeps brand color (don't fade it to subtle-hover). */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  [class*="grid-cols-\[24px_1fr_15px\]"]:hover,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  [class*="grid-cols-\[24px_1fr_15px\]"][data-state="open"] {
+  background-color: var(--brand-secondary-text) !important; /* #4158bd */
+}
+
+/* Hide the dashed divider directly below the header — it adds noise on
+   a 56px rail. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .bg-ui-bg-subtle.sticky
+  > .px-3 {
+  display: none !important;
+}
+
+/* ── 4. Searchbar → icon-only round-trigger (still focusable) ──────── */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3:first-child {
+  padding: 0 8px !important;
+}
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3:first-child > button {
+  width: 40px !important;
+  height: 40px !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border-radius: var(--radii-md) !important;          /* 8px */
+  background-color: transparent !important;
+  margin: 0 auto !important;
+}
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3:first-child > button:hover {
+  background-color: var(--bg-subtle-hover) !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button > div,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button > span:last-child {
+  display: none !important;                           /* label + ⌘K hint */
+}
+
+/* ── 5. NavItem rows → 40×40 icon-only rail buttons ────────────────── */
+/* NavItem outer container is <div class="px-3"> wrapping the NavLink. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 {
+  padding: 0 8px !important;
+}
+
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  margin: 2px auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0 !important;
+  border-radius: var(--radii-md) !important;          /* 8px */
+  color: var(--fg-muted) !important;                  /* default rail icon */
+  background-color: transparent !important;
+  box-shadow: none !important;                        /* kill the active card shadow */
+}
+
+/* Hide labels: every Text inside the NavLink. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a > span,
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a > p {
+  display: none !important;
+}
+
+/* Keep the icon wrapper centered. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a > div {
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Hover state — Happilee subtle hover. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a:hover {
+  background-color: var(--bg-subtle-hover) !important;
+  color: var(--fg-subtle) !important;
+}
+
+/* Selected state — brand-light fill + brand-secondary-text icon. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a.active,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3 a[aria-current="page"],
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3 a.bg-ui-bg-base {
+  background-color: var(--bg-highlight) !important;   /* #edf2fe */
+  color: var(--brand-secondary-text) !important;      /* #4158bd */
+  box-shadow: none !important;
+}
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a.active svg,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3 a[aria-current="page"] svg,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3 a.bg-ui-bg-base svg {
+  color: var(--brand-secondary-text) !important;
+}
+
+/* Default icon color via the `[&>svg]:text-ui-fg-subtle` rule loses out
+   to our color override above — but be explicit. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 a > div > svg {
+  color: inherit !important;
+}
+
+/* ── 6. Collapse the nested Collapsible (sub-routes) on desktop ────── */
+/* On the 56px rail the sub-route lists are unusable; Medusa's nav-item
+   already hides them on desktop via lg:hidden on the trigger. We
+   additionally hide the inline mobile-only Collapsible content so it
+   never accidentally renders open at our viewport. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3 [data-state]:not([data-state="closed"]) > div {
+  display: none !important;
+}
+
+/* The dashed dividers between sections are visual noise on a rail. */
+[class~="w-\[220px\]"]:has(> aside) aside .px-3 > hr,
+[class~="w-\[220px\]"]:has(> aside) aside .px-3 > div[role="separator"] {
+  display: none !important;
+}
+
+/* Extension section header ("Extensions" label + chevron) — hide. */
+[class~="w-\[220px\]"]:has(> aside) aside .group\/trigger {
+  display: none !important;
+}
+
+/* ── 7. UserSection (avatar pill at bottom) → 40×40 avatar circle ──── */
+[class~="w-\[220px\]"]:has(> aside) aside .bg-ui-bg-subtle.sticky.bottom-0 {
+  padding: 8px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .bg-ui-bg-subtle.sticky.bottom-0
+  .px-3 {
+  display: none !important;                           /* dashed divider */
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .bg-ui-bg-subtle.sticky.bottom-0
+  button {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: var(--radii-md) !important;
+  justify-content: center !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .bg-ui-bg-subtle.sticky.bottom-0
+  button > *:not([class*="avatar"]):not([class*="Avatar"]) {
+  display: none !important;
+}
+
+/* ── 8. Main content area: align gutter to the new 56px rail ───────── */
+/* Shell wraps the main column in `<div class="flex h-screen w-full
+   flex-col overflow-auto">`. The container itself already takes the
+   remaining width via flex, so no margin tweak is required when the
+   sidebar shrinks. We just relax the gutter's left padding on lg+ so
+   content doesn't feel cramped at the new offset. */
+@media (min-width: 1024px) {
+  main > .max-w-\[1600px\] {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* ── 9. Page surface — keep #fafafa under the new white rail ───────── */
+body,
+html {
+  background-color: var(--bg-subtle);
+}
+
+/* =====================================================================
+   POLISH PASS — fixes alignment + overflow regressions
+   Issues addressed (1–6):
+   1. Icons left-aligned not centered in 56px rail
+   2. "Settings" label clipping ("Set" only visible)
+   3. Search "⌘K" hint bleeding through (Text renders <p> not <span>)
+   4. Stray "H" avatar pill at the bottom (UserBadge also uses
+      grid-cols-[24px_1fr_15px] like the Header — selector collision)
+   5. Two H marks visible because UserBadge ::after also fires
+   6. Group spacing — add a small vertical gap between top/nav/util/user
+   ===================================================================== */
+
+/* ── P-1. Force-center the *outer* px-3 wrapper of every NavItem ────── */
+/* NavItem.tsx wraps each row in <div class="px-3"> then ConditionalTooltip
+   inserts <div class="w-full"> then <NavLink>. The flex-center must live
+   on the outer .px-3 so the NavLink (40×40) is centered in the 56px rail
+   even when the inner w-full div tries to stretch. */
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+[class~="w-\[220px\]"]:has(> aside) aside nav > .px-3 > div.w-full {
+  width: 40px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* UtilitySection's outer flex column wraps Settings in its own .px-3.
+   Same centering rule. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  > div > div > div > div > .flex.flex-col > .px-3,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 > .px-3 {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* ── P-2. Settings (and any setting-type NavItem) — show only icon ──── */
+/* When NavItem renders with type="core" (UtilitySection default), it has
+   <div size-6><icon/></div><Text>label</Text>. We already hide <p> at
+   the nav-level rule. But UtilitySection lives OUTSIDE the <nav> element
+   (it's a sibling under the flex-col column). Hide its labels too. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > p,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > span {
+  display: none !important;
+}
+
+/* Force the Settings NavLink to the same 40×40 centered pill. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  margin: 2px auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0 !important;
+  border-radius: var(--radii-md) !important;
+  color: var(--fg-muted) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a:hover {
+  background-color: var(--bg-subtle-hover) !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 .px-3 a > div {
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ── P-3. Searchbar ⌘K hint — Text renders <p>, not <span> ─────────── */
+/* Hide BOTH the middle label div and the trailing ⌘K <p> Text node. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button > div,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button > p,
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button > span {
+  display: none !important;
+}
+/* Re-center the search icon-button. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  nav > .px-3:first-child > button {
+  gap: 0 !important;
+}
+
+/* ── P-4 + P-5. Workspace mark vs UserBadge — disambiguate ─────────── */
+/* The Header AND the UserBadge both use grid-cols-[24px_1fr_15px]. Our
+   earlier rule applied the brand "H" treatment to BOTH, which is why a
+   second H pill appeared at the bottom. Scope the brand-mark rules to
+   ONLY the Header (lives inside `.bg-ui-bg-subtle.sticky.top-0`). */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0
+  [class*="grid-cols-\[24px_1fr_15px\]"] {
+  background-color: transparent !important;
+  border-radius: var(--radii-full) !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+/* Kill the injected "H" ::after on the bottom (user) pill — only the
+   real Avatar (the user's initial) should render there. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0
+  [class*="grid-cols-\[24px_1fr_15px\]"]::after {
+  content: none !important;
+  display: none !important;
+}
+/* Restore the user-avatar visibility (we previously hid all children of
+   the grid trigger globally — un-hide the avatar wrapper for the user
+   pill). */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0
+  [class*="grid-cols-\[24px_1fr_15px\]"] > div:first-child {
+  display: flex !important;
+  width: 24px !important;
+  height: 24px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+/* Hide displayName text + ellipsis on the user pill. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0
+  [class*="grid-cols-\[24px_1fr_15px\]"] > div:nth-child(2),
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0
+  [class*="grid-cols-\[24px_1fr_15px\]"] > svg {
+  display: none !important;
+}
+
+/* The outer wrapper that hosts the user pill (`<div class="p-3">`) — center
+   the 36px pill inside the 56px rail. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0 .p-3 {
+  padding: 8px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+/* Also flatten the dashed-divider wrapper that sits just above the user
+   pill — it's a `<div class="px-3"><Divider/></div>` and visually noisy
+   on a 56px rail. */
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0 > div > .px-3:has(> hr),
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .sticky.bottom-0 > div > .px-3:has(> div[role="separator"]) {
+  display: none !important;
+}
+
+/* ── P-6. Subtle vertical rhythm between rail groups ───────────────── */
+/* Add a small top-padding above the search/nav band, and breathing room
+   between the nav block and the UtilitySection (Settings) below. */
+[class~="w-\[220px\]"]:has(> aside) aside nav {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+[class~="w-\[220px\]"]:has(> aside)
+  aside
+  .flex.flex-col.gap-y-0\.5.py-3 {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  border-top: 1px solid var(--border-menu-bot);
+  margin-top: 4px !important;
+}
